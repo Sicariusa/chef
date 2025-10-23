@@ -18,6 +18,21 @@ export const getMyRole = query({
 });
 
 /**
+ * Check if current user is admin - used internally by mutations
+ */
+export const isAdmin = query({
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return false;
+    const r = await ctx.db
+      .query("roles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .unique();
+    return r?.role === "admin";
+  },
+});
+
+/**
  * Admin-only mutation to assign a role to a userId.
  * Use cautiously; only initial admin seeding or admin users should call it.
  */
