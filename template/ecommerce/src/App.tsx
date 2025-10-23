@@ -16,10 +16,10 @@ export default function App() {
     useState<Id<"products"> | null>(null);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--gray-50)" }}>
       <Authenticated>
         <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
-        <main className="flex-1">
+        <main style={{ flex: 1 }}>
           {currentPage === "home" && (
             <HomePage
               setCurrentPage={setCurrentPage}
@@ -35,11 +35,11 @@ export default function App() {
       </Authenticated>
 
       <Unauthenticated>
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="w-full max-w-md mx-auto">
-            <div className="flex flex-col gap-section">
-              <div className="text-center">
-                <h1 className="text-5xl font-bold text-primary mb-4">
+        <div className="flex items-center justify-center" style={{ flex: 1, padding: "32px" }}>
+          <div style={{ width: "100%", maxWidth: "400px", margin: "0 auto" }}>
+            <div className="auth-form">
+              <div className="text-center mb-xl">
+                <h1 style={{ fontSize: "3rem", fontWeight: 700, color: "var(--primary)", marginBottom: "16px" }}>
                   🛒 Chef Store
                 </h1>
                 <p className="text-xl text-secondary">

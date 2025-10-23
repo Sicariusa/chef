@@ -51,13 +51,8 @@ export const listAllOrders = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
-    const role = (
-      await ctx.db
-        .query("roles")
-        .withIndex("by_user", (q) => q.eq("userId", userId))
-        .unique()
-    )?.role;
-    if (role !== "admin") throw new Error("Forbidden");
+    const user = await ctx.db.get(userId);
+    if (!user || user.role !== "admin") throw new Error("Forbidden");
     return await ctx.db.query("orders").collect();
   },
 });
@@ -68,13 +63,8 @@ export const updateOrderStatus = mutation({
   handler: async (ctx, { id, status }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
-    const role = (
-      await ctx.db
-        .query("roles")
-        .withIndex("by_user", (q) => q.eq("userId", userId))
-        .unique()
-    )?.role;
-    if (role !== "admin") throw new Error("Forbidden");
+    const user = await ctx.db.get(userId);
+    if (!user || user.role !== "admin") throw new Error("Forbidden");
     return await ctx.db.patch(id, { status });
   },
 });

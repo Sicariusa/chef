@@ -3,6 +3,9 @@ import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 const applicationTables = {
+  users: defineTable({
+    role: v.optional(v.union(v.literal("customer"), v.literal("admin"))), // defaults to 'customer'
+  }),
   products: defineTable({
     title: v.string(),
     description: v.string(),
@@ -32,10 +35,6 @@ const applicationTables = {
     total: v.number(),
     status: v.string(), // 'pending', 'paid', 'shipped'
     createdAt: v.number(),
-  }).index("by_user", ["userId"]),
-  roles: defineTable({
-    userId: v.id("users"),
-    role: v.string(), // 'admin' | 'user'
   }).index("by_user", ["userId"]),
 };
 

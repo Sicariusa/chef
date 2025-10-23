@@ -4,7 +4,7 @@ import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 
 export function AdminDashboard() {
-  const role = useQuery(api.roles.getMyRole);
+  const loggedInUser = useQuery(api.auth.loggedInUser);
   const products = useQuery(api.products.listProducts) ?? [];
   const orders = useQuery(api.orders.listAllOrders) ?? [];
   const createProduct = useMutation(api.products.createProduct);
@@ -23,7 +23,7 @@ export function AdminDashboard() {
   const [isCreating, setIsCreating] = useState(false);
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
 
-  if (role !== "admin") {
+  if (loggedInUser?.role !== "admin") {
     return (
       <main className="min-h-screen bg-gradient-to-br from-gray-50 to-red-50">
         <div className="container mx-auto px-4 py-16">

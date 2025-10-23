@@ -26,7 +26,10 @@ export function CartPage({ setCurrentPage }: CartPageProps) {
   }));
 
   const total = cartWithProducts.reduce(
-    (sum, item) => sum + (item.product?.price ?? 0) * item.quantity,
+    (sum, item) => {
+      if (!item) return sum;
+      return sum + (item.product?.price ?? 0) * item.quantity;
+    },
     0,
   );
 
@@ -113,14 +116,16 @@ export function CartPage({ setCurrentPage }: CartPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-6">
-            {cartWithProducts.map((item, index) => (
-              <div
-                key={item._id}
-                className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-all duration-300 hover:shadow-md ${
-                  removingItems.has(item._id) ? 'opacity-50 scale-95' : 'animate-fade-in-up'
-                }`}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
+            {cartWithProducts.map((item, index) => {
+              if (!item) return null;
+              return (
+                <div
+                  key={item._id}
+                  className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-all duration-300 hover:shadow-md ${
+                    removingItems.has(item._id) ? 'opacity-50 scale-95' : 'animate-fade-in-up'
+                  }`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
                 <div className="flex gap-6">
                   {/* Product Image */}
                   <div className="relative">
@@ -200,7 +205,8 @@ export function CartPage({ setCurrentPage }: CartPageProps) {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
           
           {/* Order Summary */}

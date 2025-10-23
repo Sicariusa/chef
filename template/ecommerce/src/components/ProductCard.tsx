@@ -30,44 +30,39 @@ export function ProductCard({ product, onViewDetails }: ProductCardProps) {
   };
 
   return (
-    <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow bg-white">
+    <div className="product-card">
       <img
         src={
           product.image || "https://via.placeholder.com/300x200?text=Product"
         }
         alt={product.title}
-        className="h-48 w-full object-cover rounded mb-3"
+        className="product-image"
       />
-      <h3 className="font-semibold text-lg mb-2">{product.title}</h3>
-      <p className="text-sm text-secondary mb-3 line-clamp-2">
-        {product.description}
-      </p>
-      <div className="flex justify-between items-center">
-        <span className="text-xl font-bold text-primary">
-          ${product.price.toFixed(2)}
-        </span>
-        <div className="flex gap-2">
-          {onViewDetails && (
-            <button
-              onClick={() => onViewDetails(product._id)}
-              className="px-3 py-2 text-sm border border-primary text-primary rounded hover:bg-primary hover:text-white transition-colors"
-            >
-              View
+      <div className="product-content">
+        <h3 className="product-title">{product.title}</h3>
+        <p className="product-description">{product.description}</p>
+        <div className="product-footer">
+          <span className="product-price">${product.price.toFixed(2)}</span>
+          <div className="flex gap-sm">
+            {onViewDetails && (
+              <button
+                onClick={() => onViewDetails(product._id)}
+                className="btn btn-outline btn-sm"
+              >
+                View
+              </button>
+            )}
+            <button onClick={handleAddToCart} className="btn btn-primary btn-sm">
+              Add to Cart
             </button>
-          )}
-          <button
-            onClick={handleAddToCart}
-            className="px-3 py-2 text-sm bg-primary text-white rounded hover:bg-primary-hover transition-colors"
-          >
-            Add to Cart
-          </button>
+          </div>
         </div>
+        {product.stock !== undefined && product.stock < 10 && (
+          <p className="text-sm text-error" style={{ marginTop: "8px" }}>
+            Only {product.stock} left in stock!
+          </p>
+        )}
       </div>
-      {product.stock !== undefined && product.stock < 10 && (
-        <p className="text-xs text-red-500 mt-2">
-          Only {product.stock} left in stock!
-        </p>
-      )}
     </div>
   );
 }
