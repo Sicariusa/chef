@@ -1,16 +1,82 @@
 export const SUGGESTIONS = [
   {
-    title: 'E-Commerce Store',
-    prompt: `Build a fully-featured online store with product listing, shopping cart, checkout, order management, and admin dashboard. Include the following features:
+    title: 'Modern Minimal Store',
+    prompt: `Build a modern, minimalist e-commerce store with the "modern-minimal" template. Use clean design, subtle animations, and focus on typography. Include:
 
-- Product catalog with search and filtering
-- Shopping cart with add/remove items and quantity updates
-- Checkout process that creates orders
-- User order history
-- Admin dashboard for product management (create, update, delete)
-- Admin dashboard for viewing and managing all orders
-- Role-based access control (user and admin roles)
-- Real-time updates for product availability and order status`,
+- Product catalog with grid layout (1/2/4 columns)
+- Shopping cart with smooth transitions
+- Checkout and order management
+- Admin dashboard for products and orders
+- Role-based access control
+- Soft shadows and gentle animations (300ms)
+- Inter font family
+- Blue color scheme (#2563eb)`,
+  },
+  {
+    title: 'Luxury Fashion Store',
+    prompt: `Build an elegant luxury e-commerce store with the "luxury-store" template. Use sophisticated design with gold accents. Include:
+
+- Premium product showcase
+- Shopping cart and checkout
+- Order history and management
+- Admin dashboard
+- Role-based access control
+- Playfair Display headings with Inter body
+- Dark slate and gold color scheme
+- Refined animations (400ms)`,
+  },
+  {
+    title: 'Tech Gadgets Shop',
+    prompt: `Build a futuristic tech gadgets store with the "tech-gadgets" template. Use dark theme with glassmorphism. Include:
+
+- Product catalog with glass card effects
+- Shopping cart and checkout
+- Order management
+- Admin dashboard
+- Role-based access control
+- Dark theme (#0f172a background)
+- Neon glow effects
+- Vibrant gradients (Indigo → Purple → Cyan)
+- Poppins font family`,
+  },
+  {
+    title: 'Fashion Boutique',
+    prompt: `Build a trendy fashion boutique with the "fashion-boutique" template. Use vibrant colors and playful animations. Include:
+
+- Product catalog with masonry grid
+- Shopping cart and checkout
+- Order management
+- Admin dashboard
+- Role-based access control
+- Hot pink and purple palette (#ec4899)
+- Playful bounce animations (350ms)
+- Poppins font family`,
+  },
+  {
+    title: 'Organic Shop',
+    prompt: `Build a natural organic products store with the "organic-shop" template. Use earthy colors and gentle animations. Include:
+
+- Product catalog with natural styling
+- Shopping cart and checkout
+- Order management
+- Admin dashboard
+- Role-based access control
+- Green and earth tone palette (#059669)
+- Gentle transitions (400ms)
+- Eco-friendly design aesthetic`,
+  },
+  {
+    title: 'Custom Store (Blank)',
+    prompt: `Build an e-commerce store starting from the "blank-starter" template. Use minimal styling for full customization. Include:
+
+- Product catalog with basic grid
+- Shopping cart and checkout
+- Order management
+- Admin dashboard
+- Role-based access control
+- Neutral color scheme
+- Simple animations (200ms)
+- Ready for custom styling`,
   },
 ];
 

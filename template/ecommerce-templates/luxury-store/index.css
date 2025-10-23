@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-light: #fefefe;
+    --color-dark: #0f172a;
+    --color-gold: #d4af37;
+  }
+
+  body {
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--color-dark);
+    background: var(--color-light);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Playfair Display", serif;
+    letter-spacing: 0.02em;
+  }
+}
+
+@layer components {
+  /* Auth input fields */
+  .auth-input-field {
+    @apply w-full px-5 py-3.5 rounded bg-white border border-gray-200 
+           focus:border-accent focus:ring-2 focus:ring-accent/20 
+           outline-none transition-all duration-400 shadow-sm;
+  }
+
+  /* Auth buttons */
+  .auth-button {
+    @apply w-full px-5 py-3.5 rounded bg-primary text-white font-medium 
+           hover:bg-primary-hover transition-all duration-400 shadow-luxury
+           hover:shadow-luxury-hover uppercase tracking-luxury
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Luxury card */
+  .card {
+    @apply bg-white rounded-lg border border-gray-100 transition-all duration-400;
+  }
+
+  .card-luxury {
+    @apply card shadow-luxury hover:shadow-luxury-hover;
+  }
+
+  /* Button base */
+  .btn {
+    @apply px-6 py-3 rounded font-medium transition-all duration-400
+           focus:outline-none focus:ring-2 focus:ring-offset-2 uppercase tracking-luxury;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-hover 
+           focus:ring-primary shadow-luxury hover:shadow-luxury-hover;
+  }
+
+  .btn-gold {
+    @apply btn bg-accent text-primary hover:bg-accent-hover 
+           focus:ring-accent shadow-gold;
+  }
+
+  .btn-outline {
+    @apply btn border-2 border-primary text-primary hover:bg-primary hover:text-white;
+  }
+
+  /* Luxury divider */
+  .divider-luxury {
+    @apply relative flex items-center py-8;
+  }
+
+  .divider-luxury::before,
+  .divider-luxury::after {
+    @apply flex-1 border-t border-gray-200;
+    content: "";
+  }
+
+  .divider-luxury span {
+    @apply px-4 text-xs uppercase tracking-luxury text-secondary;
+  }
+
+  /* Gold accent line */
+  .gold-line {
+    @apply w-20 h-0.5 bg-gradient-to-r from-gold-light via-gold to-gold-light;
+  }
+
+  /* Premium badge */
+  .badge-premium {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+           bg-gradient-to-r from-gold-light to-gold text-primary
+           shadow-gold uppercase tracking-luxury;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Gradient text */
+  .text-gradient-gold {
+    @apply bg-gradient-to-r from-gold-dark via-gold to-gold-light bg-clip-text text-transparent;
+  }
+}
+
+/* Smooth page transitions */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Loading shimmer effect */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}

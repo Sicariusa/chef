@@ -21,6 +21,57 @@ export function solutionConstraints(options: SystemPromptOptions) {
       - Frontend pages: HomePage (product listing), CartPage, OrdersPage, AdminDashboard
       - Frontend components: Navbar, ProductCard
       
+      # AVAILABLE E-COMMERCE TEMPLATES
+      The system provides 6 pre-designed templates with unique styling:
+      
+      1. **modern-minimal**: Clean, minimalist design
+         - Colors: Blue (#2563eb primary), Slate (#64748b secondary), Sky Blue (#0ea5e9 accent)
+         - Fonts: Inter
+         - Animations: 300ms, subtle fade/slide/scale
+         - Layout: Grid (1/2/4 columns), minimal card style
+         
+      2. **luxury-store**: Elegant, premium design with gold accents
+         - Colors: Dark Slate (#1e293b primary), Gray (#94a3b8 secondary), Gold (#d4af37 accent)
+         - Fonts: Playfair Display (headings), Inter (body)
+         - Animations: 400ms, refined transitions
+         - Layout: Grid (1/2/3 columns), elevated card style
+         
+      3. **tech-gadgets**: Futuristic dark theme with glassmorphism
+         - Colors: Indigo (#6366f1 primary), Purple (#8b5cf6 secondary), Cyan (#06b6d4 accent)
+         - Background: Dark Navy (#0f172a)
+         - Fonts: Poppins, JetBrains Mono
+         - Animations: 250ms, bouncy, neon glow effects
+         - Layout: Grid (1/2/4 columns), glass card style
+         
+      4. **fashion-boutique**: Vibrant, playful design with pink/purple
+         - Colors: Hot Pink (#ec4899 primary), Pink (#f472b6 secondary), Purple (#a855f7 accent)
+         - Fonts: Poppins
+         - Animations: 350ms, playful bounce
+         - Layout: Masonry grid (2/3/4 columns), bordered card style
+         
+      5. **organic-shop**: Natural, earthy design with green tones
+         - Colors: Emerald (#059669 primary), Green (#10b981 secondary), Amber (#f59e0b accent)
+         - Fonts: Poppins
+         - Animations: 400ms, gentle transitions
+         - Layout: Grid (1/2/3 columns), minimal card style
+         
+      6. **blank-starter**: Minimal starting point for custom design
+         - Colors: Indigo (#4f46e5 primary), Gray (#6b7280 secondary), Purple (#8b5cf6 accent)
+         - Fonts: Inter
+         - Animations: 200ms, basic transitions
+         - Layout: Grid (1/2/3 columns), minimal card style
+      
+      When the user specifies a template or design style, apply the corresponding template's styling:
+      - Update src/index.css with the template's theme variables and custom styles
+      - Update tailwind.config.js with the template's color palette, fonts, and animations
+      - Apply the template's layout configuration (grid columns, card styles)
+      - Use the template's animation durations and easing functions
+      - Incorporate the template's design aesthetic (minimal, luxury, tech, playful, natural, or blank)
+      
+      If no template is specified, use "modern-minimal" as the default.
+      
+      Users can customize any template by asking to change colors, fonts, animations, or layout.
+      
       Do not modify locked Chef files. Add new files as needed following the e-commerce template pattern.
     </ecommerce_only>
 
