@@ -1,4 +1,5 @@
 import { defineSchema, defineTable } from "convex/server";
+import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import type { Infer, Validator } from "convex/values";
 import type { CoreMessage } from "ai";
@@ -24,6 +25,9 @@ export const usageRecordValidator = v.object({
 export type UsageRecord = Infer<typeof usageRecordValidator>;
 
 export default defineSchema({
+  // Include Convex Auth tables
+  ...authTables,
+  
   /*
    * We create a session (if it does not exist) and store the ID in local storage.
    * We only show chats for the current session, so we rely on the session ID being
