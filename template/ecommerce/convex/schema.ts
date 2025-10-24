@@ -4,8 +4,11 @@ import { v } from "convex/values";
 
 const applicationTables = {
   users: defineTable({
+    subject: v.string(), // Required by Convex Auth
     role: v.optional(v.union(v.literal("customer"), v.literal("admin"))), // defaults to 'customer'
-  }),
+    isAnonymous: v.optional(v.boolean()),
+  })
+    .index("by_subject", ["subject"]),
   products: defineTable({
     title: v.string(),
     description: v.string(),

@@ -146,6 +146,7 @@ export function solutionConstraints(options: SystemPromptOptions) {
           image: v.optional(v.string()),
           email: v.optional(v.string()),
           emailVerificationTime: v.optional(v.number()),
+          role: v.optional(v.union(v.literal("customer"), v.literal("admin"))),
           phone: v.optional(v.string()),
           phoneVerificationTime: v.optional(v.number()),
           isAnonymous: v.optional(v.boolean()),

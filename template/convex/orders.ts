@@ -1,6 +1,17 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, MutationCtx, QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
+
+/**
+ * Helper function to check if the current user is an admin
+ * @throws Error if user is not authenticated or not an admin
+ */
+async function requireAdmin(ctx: QueryCtx | MutationCtx): Promise<void> {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) throw new Error("Not authenticated");
+  const user = await ctx.db.get(userId);
+  if (!user || user.role !== "admin") throw new Error("Forbidden");
+}
 
 /** List current user's orders */
 export const listOrdersForUser = query({
@@ -49,15 +60,7 @@ export const placeOrder = mutation({
 /** Admin: list all orders */
 export const listAllOrders = query({
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-    const role = (
-      await ctx.db
-        .query("roles")
-        .withIndex("by_user", (q) => q.eq("userId", userId))
-        .unique()
-    )?.role;
-    if (role !== "admin") throw new Error("Forbidden");
+    await requireAdmin(ctx);
     return await ctx.db.query("orders").collect();
   },
 });
@@ -66,15 +69,7 @@ export const listAllOrders = query({
 export const updateOrderStatus = mutation({
   args: { id: v.id("orders"), status: v.string() },
   handler: async (ctx, { id, status }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-    const role = (
-      await ctx.db
-        .query("roles")
-        .withIndex("by_user", (q) => q.eq("userId", userId))
-        .unique()
-    )?.role;
-    if (role !== "admin") throw new Error("Forbidden");
+    await requireAdmin(ctx);
     return await ctx.db.patch(id, { status });
   },
 });

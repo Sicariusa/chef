@@ -495,13 +495,13 @@ export function AdminDashboard() {
                     <div className="flex justify-between items-center">
                       <span className="text-green-700">Low Stock Items</span>
                       <span className="text-xl font-semibold text-green-800">
-                        {products.filter(p => p.stock < 10).length}
+                        {products.filter(p => (p.stock ?? 0) < 10).length}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-green-700">Out of Stock</span>
                       <span className="text-xl font-semibold text-green-800">
-                        {products.filter(p => p.stock === 0).length}
+                        {products.filter(p => (p.stock ?? 0) === 0).length}
                       </span>
                     </div>
                   </div>
@@ -510,6 +510,7 @@ export function AdminDashboard() {
             </div>
           )}
         </div>
+      </div>
     </main>
   );
 }

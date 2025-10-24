@@ -1,16 +1,17 @@
 export const SUGGESTIONS = [
   {
     title: 'Modern Minimal Store',
-    prompt: `Build a modern, minimalist e-commerce store with the "modern-minimal" template. Use clean design, subtle animations, and focus on typography. Include:
-
-- Product catalog with grid layout (1/2/4 columns)
-- Shopping cart with smooth transitions
-- Checkout and order management
-- Admin dashboard for products and orders
-- Role-based access control
-- Soft shadows and gentle animations (300ms)
-- Inter font family
-- Blue color scheme (#2563eb)`,
+    prompt: `Build a modern, minimalist e-commerce store with the "modern-minimal" template. Use clean design, subtle animations. Include:
+- Home page with hero section and product catalog.
+- Product page with product details and add to cart button.
+- Shopping cart page with product details and checkout button.
+- Checkout page with payment details and order confirmation.
+- Order history page with order details.
+- Admin dashboard for products and orders.
+- Role-based access control.
+- Soft shadows and gentle animations (300ms).
+- Inter font family.
+- Blue color scheme (#2563eb).`,
   },
   {
     title: 'Luxury Fashion Store',

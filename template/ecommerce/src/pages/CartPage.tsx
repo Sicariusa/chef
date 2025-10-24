@@ -2,6 +2,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { useState } from "react";
+import type { Id } from "../../convex/_generated/dataModel";
 
 interface CartPageProps {
   setCurrentPage: (page: string) => void;
@@ -13,7 +14,7 @@ export function CartPage({ setCurrentPage }: CartPageProps) {
   const updateCartItem = useMutation(api.cart.updateCartItem);
   const placeOrder = useMutation(api.orders.placeOrder);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const [removingItems, setRemovingItems] = useState<Set<string>>(new Set());
+  const [removingItems, setRemovingItems] = useState<Set<Id<"cart">>>(new Set());
 
   // Fetch product details for each cart item
   const productQueries = cart.map((item) =>
@@ -33,26 +34,26 @@ export function CartPage({ setCurrentPage }: CartPageProps) {
     0,
   );
 
-  const handleRemove = async (id: string) => {
-    setRemovingItems(prev => new Set(prev).add(id));
+  const handleRemove = async (id: Id<"cart">) => {
+    const idSet = new Set(removingItems);
+    idSet.add(id);
+    setRemovingItems(idSet);
     try {
-      await removeFromCart({ id: id as any });
+      await removeFromCart({ id });
       toast.success("Item removed from cart");
     } catch (error: any) {
       toast.error(error.message || "Failed to remove item");
     } finally {
-      setRemovingItems(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(id);
-        return newSet;
-      });
+      const idSet = new Set(removingItems);
+      idSet.delete(id);
+      setRemovingItems(idSet);
     }
   };
 
-  const handleUpdateQuantity = async (id: string, quantity: number) => {
+  const handleUpdateQuantity = async (id: Id<"cart">, quantity: number) => {
     if (quantity < 1) return;
     try {
-      await updateCartItem({ id: id as any, quantity });
+      await updateCartItem({ id, quantity });
     } catch (error: any) {
       toast.error(error.message || "Failed to update quantity");
     }

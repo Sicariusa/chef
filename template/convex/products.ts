@@ -1,6 +1,17 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, MutationCtx, QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
+
+/**
+ * Helper function to check if the current user is an admin
+ * @throws Error if user is not authenticated or not an admin
+ */
+async function requireAdmin(ctx: QueryCtx | MutationCtx): Promise<void> {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) throw new Error("Not authenticated");
+  const user = await ctx.db.get(userId);
+  if (!user || user.role !== "admin") throw new Error("Forbidden");
+}
 
 /** List all products (public) */
 export const listProducts = query({
@@ -27,15 +38,7 @@ export const createProduct = mutation({
     stock: v.optional(v.number()),
   },
   handler: async (ctx, product) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-    const role = (
-      await ctx.db
-        .query("roles")
-        .withIndex("by_user", (q) => q.eq("userId", userId))
-        .unique()
-    )?.role;
-    if (role !== "admin") throw new Error("Forbidden");
+    await requireAdmin(ctx);
     return await ctx.db.insert("products", {
       ...product,
       createdAt: Date.now(),
@@ -54,15 +57,7 @@ export const updateProduct = mutation({
     stock: v.optional(v.number()),
   },
   handler: async (ctx, { id, ...patch }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-    const role = (
-      await ctx.db
-        .query("roles")
-        .withIndex("by_user", (q) => q.eq("userId", userId))
-        .unique()
-    )?.role;
-    if (role !== "admin") throw new Error("Forbidden");
+    await requireAdmin(ctx);
     return await ctx.db.patch(id, { ...patch, updatedAt: Date.now() });
   },
 });
@@ -71,15 +66,7 @@ export const updateProduct = mutation({
 export const deleteProduct = mutation({
   args: { id: v.id("products") },
   handler: async (ctx, { id }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-    const role = (
-      await ctx.db
-        .query("roles")
-        .withIndex("by_user", (q) => q.eq("userId", userId))
-        .unique()
-    )?.role;
-    if (role !== "admin") throw new Error("Forbidden");
+    await requireAdmin(ctx);
     return await ctx.db.delete(id);
   },
 });

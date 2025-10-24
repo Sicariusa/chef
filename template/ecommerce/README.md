@@ -62,10 +62,28 @@ const { useMutation } = await import("convex/react");
 Alternatively, use the Convex dashboard to run:
 
 ```
-npx convex run roles:seedMyAdmin
+npx convex run admin:seedMyAdmin
 ```
 
 This grants admin privileges to your current user account.
+
+### 4. Migrate from userRoles Table (if needed)
+
+If you have an existing `userRoles` table that you want to remove:
+
+1. Check if the table exists:
+```bash
+npx convex run migrations:checkUserRolesTable
+```
+
+2. Run the migration:
+```bash
+npx convex run migrations:migrateUserRoles
+```
+
+3. Manually delete the `userRoles` table from your Convex dashboard
+
+See `USER_ROLE_MIGRATION_GUIDE.md` for detailed instructions.
 
 ## Database Schema
 
@@ -74,8 +92,7 @@ This grants admin privileges to your current user account.
 - **products**: Product catalog with title, description, price, image, and stock
 - **cart**: User shopping cart items
 - **orders**: Customer orders with items and status
-- **roles**: User roles (admin/user) for access control
-- **users**: User accounts (from Convex Auth)
+- **users**: User accounts (from Convex Auth) with role attribute (customer/admin)
 
 ## Roles & Permissions
 
@@ -103,7 +120,7 @@ template/ecommerce/
 │   ├── products.ts      # Product CRUD operations
 │   ├── cart.ts          # Shopping cart operations
 │   ├── orders.ts        # Order management
-│   └── roles.ts         # Role-based access control
+│   └── admin.ts         # Admin operations and role management
 ├── src/
 │   ├── components/      # React components
 │   │   ├── Navbar.tsx

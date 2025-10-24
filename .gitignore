@@ -2,6 +2,8 @@
 convex/_generated/
 _generated/
 /_generated
+# Compiled JavaScript files from TypeScript in convex directories
+**/convex/**/*.js
 .cursorignore
 .cursor
 /.cursor

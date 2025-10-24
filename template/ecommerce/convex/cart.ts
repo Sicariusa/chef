@@ -4,6 +4,15 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 
 /** Get logged-in user's cart */
 export const getCart = query({
+  args: {},
+  returns: v.array(v.object({
+    _id: v.id("cart"),
+    _creationTime: v.number(),
+    userId: v.id("users"),
+    productId: v.id("products"),
+    quantity: v.number(),
+    addedAt: v.number(),
+  })),
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
@@ -17,6 +26,7 @@ export const getCart = query({
 /** Add item to cart */
 export const addToCart = mutation({
   args: { productId: v.id("products"), quantity: v.number() },
+  returns: v.null(),
   handler: async (ctx, { productId, quantity }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
@@ -27,22 +37,25 @@ export const addToCart = mutation({
       )
       .unique();
     if (existing) {
-      return await ctx.db.patch(existing._id, {
+      await ctx.db.patch(existing._id, {
         quantity: existing.quantity + quantity,
       });
+      return null;
     }
-    return await ctx.db.insert("cart", {
+    await ctx.db.insert("cart", {
       userId,
       productId,
       quantity,
       addedAt: Date.now(),
     });
+    return null;
   },
 });
 
 /** Update cart item quantity */
 export const updateCartItem = mutation({
   args: { id: v.id("cart"), quantity: v.number() },
+  returns: v.null(),
   handler: async (ctx, { id, quantity }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
@@ -58,6 +71,7 @@ export const updateCartItem = mutation({
 /** Remove from cart */
 export const removeFromCart = mutation({
   args: { id: v.id("cart") },
+  returns: v.null(),
   handler: async (ctx, { id }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
@@ -69,6 +83,8 @@ export const removeFromCart = mutation({
 
 /** Clear user's cart */
 export const clearCart = mutation({
+  args: {},
+  returns: v.null(),
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");

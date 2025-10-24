@@ -7,6 +7,11 @@ import { getAuthUserId } from "@convex-dev/auth/server";
  * Call once from the web UI after creating an account, or run from your admin console.
  */
 export const seedMyAdmin = mutation({
+  args: {},
+  returns: v.object({
+    success: v.boolean(),
+    message: v.string(),
+  }),
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
@@ -27,6 +32,10 @@ export const assignRole = mutation({
     userId: v.id("users"), 
     role: v.union(v.literal("customer"), v.literal("admin")) 
   },
+  returns: v.object({
+    success: v.boolean(),
+    message: v.string(),
+  }),
   handler: async (ctx, { userId, role }) => {
     const currentUserId = await getAuthUserId(ctx);
     if (!currentUserId) throw new Error("Not authenticated");
