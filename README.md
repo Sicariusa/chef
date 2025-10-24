@@ -23,16 +23,24 @@ Visit our [documentation](https://docs.convex.dev/chef) to learn more about Chef
 The easiest way to build with Chef is through our hosted [webapp](https://chef.convex.dev), which includes a generous free tier. If you want to
 run Chef locally, you can follow the guide below.
 
-> [!IMPORTANT]
-> Chef is provided as-is, using an authentication configuration specific to Convex's internal control plane that manages user accounts.
+# Multi-Tenant Deployment
 
-If you are planning on developing a fork of Chef for production use or re-distribution, your fork will need to replace the existing authentication system with your own. We recommend using the [OAuth Authorization Code Grant](https://docs.convex.dev/platform-apis/oauth-applications#implementing-oauth) flow to authorize access to Convex teams or projects. [Read more about available Platform APIs](https://docs.convex.dev/platform-apis).
+Chef now supports multi-tenant deployments! Users can sign in with their Google or GitHub accounts and create Convex projects in their own teams. Each user manages and pays for their own Convex usage.
+
+**For multi-tenant deployment:**
+
+- See `MULTI_TENANT_DEPLOYMENT.md` for complete setup instructions
+- Configure Google/GitHub OAuth providers
+- Set up Convex OAuth for project creation
+- Deploy to your own infrastructure
+
+The hosted version at [chef.convex.dev](https://chef.convex.dev) uses Convex's internal authentication. If you're deploying your own instance, you'll use the multi-tenant setup with standard OAuth providers.
 
 Chef is easy to use for local development without changes. Read on for instructions for using Chef locally.
 
 ### Running Locally
 
-Note: This will use the hosted Convex control plane to provision Convex projects. However, Chef tokens used in this enviroment will not count towards usage in your Convex account.
+**Note:** For local development, you'll need to set up OAuth providers (Google and/or GitHub). The local setup now uses the same multi-tenant authentication as production deployments.
 
 **1. Clone the project**
 
@@ -73,7 +81,7 @@ CONVEX_OAUTH_CLIENT_SECRET=<value from oauth setup>
 WORKOS_CLIENT_ID=<value from .env.development>
 ```
 
-**5. Add API keys for model providers**
+**6. Add API keys for model providers**
 
 Add any of the following API keys in your `.env.local` to enable code generation:
 
@@ -87,7 +95,7 @@ OPENROUTER_API_KEY=<your api key>
 
 Note: You can also add your own API keys through the Chef settings page.
 
-**6. Run Chef backend and frontend**
+**7. Run Chef backend and frontend**
 
 Run the following commands in your terminal:
 
@@ -98,7 +106,7 @@ pnpm run dev
 npx convex dev
 ```
 
-Congratulations, you now have Chef running locally! You can log in to Chef with your existing Convex account.
+Congratulations, you now have Chef running locally! You can sign in with Google or GitHub and connect your Convex account to start building apps.
 
 Note: Chef is accessible at http://127.0.0.1:{port}/ and will not work properly on http://localhost:{port}/.
 

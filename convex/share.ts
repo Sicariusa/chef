@@ -124,11 +124,9 @@ export async function cloneShow(
   {
     showCode,
     sessionId,
-    projectInitParams,
   }: {
     showCode: string;
     sessionId: Id<"sessions">;
-    projectInitParams: { teamSlug: string; workosAccessToken: string };
   },
 ): Promise<{ id: string; description?: string }> {
   const show = await ctx.db
@@ -198,7 +196,6 @@ export async function cloneShow(
   await startProvisionConvexProjectHelper(ctx, {
     sessionId,
     chatId: clonedChat.initialId,
-    projectInitParams,
   });
 
   return {
@@ -211,22 +208,18 @@ export const clone = mutation({
   args: {
     shareCode: v.string(),
     sessionId: v.id("sessions"),
-    projectInitParams: v.object({
-      teamSlug: v.string(),
-      workosAccessToken: v.string(),
-    }),
   },
   returns: v.object({
     id: v.string(),
     description: v.optional(v.string()),
   }),
-  handler: async (ctx, { shareCode, sessionId, projectInitParams }) => {
+  handler: async (ctx, { shareCode, sessionId }) => {
     const getShare = await ctx.db
       .query("shares")
       .withIndex("byCode", (q) => q.eq("code", shareCode))
       .first();
     if (!getShare) {
-      return cloneShow(ctx, { showCode: shareCode, sessionId, projectInitParams });
+      return cloneShow(ctx, { showCode: shareCode, sessionId });
     }
 
     const parentChat = await ctx.db.get(getShare.chatId);
@@ -290,7 +283,6 @@ export const clone = mutation({
     await startProvisionConvexProjectHelper(ctx, {
       sessionId,
       chatId: clonedChat.initialId,
-      projectInitParams,
     });
 
     return {

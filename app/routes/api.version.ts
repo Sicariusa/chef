@@ -14,8 +14,9 @@ export async function action({ request }: ActionFunctionArgs) {
     });
   }
 
+  // In local development, we don't have VERCEL_TOKEN, so return null sha (no update available)
   if (!globalEnv.VERCEL_TOKEN) {
-    return json({ error: 'Failed to fetch version information' }, { status: 500 });
+    return json({ sha: null }, { status: 200 });
   }
 
   const requestOptions = {

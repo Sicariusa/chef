@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { convexTeamsStore, type ConvexTeam } from '~/lib/stores/convexTeams';
-import { getConvexAuthToken, waitForConvexSessionId } from '~/lib/stores/sessionId';
+import { getConvexOAuthToken, waitForConvexSessionId } from '~/lib/stores/sessionId';
 import { getStoredTeamSlug, setSelectedTeamSlug } from '~/lib/stores/convexTeams';
 import { toast } from 'sonner';
 import type { ConvexReactClient } from 'convex/react';
@@ -17,11 +17,17 @@ export function useTeamsInitializer() {
 async function fetchTeams(convex: ConvexReactClient) {
   let teams: ConvexTeam[];
   await waitForConvexSessionId('fetchTeams');
+  
+  const token = getConvexOAuthToken();
+  if (!token) {
+    // User hasn't completed Convex OAuth flow yet - this is expected on first login
+    console.log('No Convex OAuth token yet - user needs to connect their Convex account');
+    convexTeamsStore.set([]);
+    setSelectedTeamSlug(null);
+    return;
+  }
+  
   try {
-    const token = getConvexAuthToken(convex);
-    if (!token) {
-      throw new Error('Missing auth token');
-    }
     const response = await fetch(`${VITE_PROVISION_HOST}/api/dashboard/teams`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -34,7 +40,7 @@ async function fetchTeams(convex: ConvexReactClient) {
     teams = await response.json();
   } catch (error) {
     console.error('Error fetching teams:', error);
-    toast.error('Failed to load user. Try logging in at https://dashboard.convex.dev.');
+    toast.error('Failed to load Convex teams. Please try reconnecting your account.');
     return;
   }
   convexTeamsStore.set(teams);

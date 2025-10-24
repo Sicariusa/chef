@@ -40,12 +40,10 @@ export const sessionIdStore = atom<Id<'sessions'> | null | undefined>(undefined)
 export const convexAuthTokenStore = atom<string | null>(null);
 
 /**
- * We send the auth token in big brain requests. The Convex client already makes
- * sure it has an up-to-date auth token, so we just need to extract it.
+ * Gets the Convex Auth token used for authenticating with Chef's Convex backend.
+ * This is the token from Google/GitHub OAuth via Convex Auth.
  *
- * This is especially convenient in functions that are not async.
- *
- * Since there's not a public API for this, we internally type cast.
+ * Use this for calls to Chef's backend (api.* mutations/queries).
  */
 export function getConvexAuthToken(convex: ConvexReactClient): string | null {
   const token = (convex as any)?.sync?.state?.auth?.value;
@@ -55,4 +53,14 @@ export function getConvexAuthToken(convex: ConvexReactClient): string | null {
   // TODO make this automatically harvested on refresh
   convexAuthTokenStore.set(token);
   return token;
+}
+
+/**
+ * Gets the Convex OAuth token used for accessing Convex's API (Big Brain).
+ * This is the token obtained from the Convex OAuth flow when connecting a Convex account.
+ *
+ * Use this for calls to Convex's dashboard API (creating projects, fetching teams, etc).
+ */
+export function getConvexOAuthToken(): string | null {
+  return localStorage.getItem('convexProjectToken');
 }

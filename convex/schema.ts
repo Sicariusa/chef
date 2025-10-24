@@ -1,4 +1,5 @@
 import { defineSchema, defineTable } from "convex/server";
+import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import type { Infer, Validator } from "convex/values";
 import type { CoreMessage } from "ai";
@@ -24,6 +25,9 @@ export const usageRecordValidator = v.object({
 export type UsageRecord = Infer<typeof usageRecordValidator>;
 
 export default defineSchema({
+  // Include Convex Auth tables
+  ...authTables,
+  
   /*
    * We create a session (if it does not exist) and store the ID in local storage.
    * We only show chats for the current session, so we rely on the session ID being
@@ -41,7 +45,7 @@ export default defineSchema({
     apiKey: v.optional(apiKeyValidator),
     convexMemberId: v.optional(v.string()),
     softDeletedForWorkOSMerge: v.optional(v.boolean()),
-    // Not authoritative, just a cache of the user's profile from WorkOS/provision host.
+    // Not authoritative, just a cache of the user's profile from auth provider/provision host.
     cachedProfile: v.optional(
       v.object({
         username: v.string(),

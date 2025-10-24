@@ -32,7 +32,7 @@ import { STATUS_MESSAGES } from './StreamingIndicator';
 import { Button } from '@ui/Button';
 import { TeamSelector } from '~/components/convex/TeamSelector';
 import { ClipboardIcon, ExternalLinkIcon } from '@radix-ui/react-icons';
-import { useConvexSessionIdOrNullOrLoading } from '~/lib/stores/sessionId';
+import { getConvexOAuthToken, useConvexSessionIdOrNullOrLoading } from '~/lib/stores/sessionId';
 import type { Id } from 'convex/_generated/dataModel';
 import { VITE_PROVISION_HOST } from '~/lib/convexProvisionHost';
 import type { ProviderType } from '~/lib/common/annotations';
@@ -265,9 +265,9 @@ export const Chat = memo(
           console.error('No team slug');
           return; // Just return instead of throwing
         }
-        const token = getConvexAuthToken(convex);
+        const token = getConvexOAuthToken();
         if (!token) {
-          console.error('No token');
+          console.error('No Convex OAuth token');
           return; // Just return instead of throwing
         }
 
@@ -300,9 +300,9 @@ export const Chat = memo(
         const chatInitialId = initialIdStore.get();
         const deploymentName = convexProjectStore.get()?.deploymentName;
         const teamSlug = selectedTeamSlugStore.get();
-        const token = getConvexAuthToken(convex);
+        const token = getConvexOAuthToken();
         if (!token) {
-          throw new Error('No token');
+          throw new Error('No Convex OAuth token');
         }
         if (!teamSlug) {
           throw new Error('No team slug');
@@ -755,21 +755,6 @@ function exponentialBackoff(numFailures: number) {
   return delay;
 }
 
-/**
- * We send the auth token in big brain requests. The Convex client already makes
- * sure it has an up-to-date auth token, so we just need to extract it.
- *
- * This is especially convenient in functions that are not async.
- *
- * Since there's not a public API for this, we internally type cast.
- */
-function getConvexAuthToken(convex: ConvexReactClient): string | null {
-  const token = (convex as any)?.sync?.state?.auth?.value;
-  if (!token) {
-    return null;
-  }
-  return token;
-}
 
 export function NoTokensText({ resetDisableChatMessage }: { resetDisableChatMessage: () => void }) {
   const selectedTeamSlug = useSelectedTeamSlug();

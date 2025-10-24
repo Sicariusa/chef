@@ -1,25 +1,30 @@
 import { useEffect } from 'react';
 import { setExtra, setUser } from '@sentry/remix';
 import { useConvex, useQuery } from 'convex/react';
-import { useConvexSessionIdOrNullOrLoading, getConvexAuthToken } from '~/lib/stores/sessionId';
+import { useConvexSessionIdOrNullOrLoading } from '~/lib/stores/sessionId';
 import { useChatId } from '~/lib/stores/chatId';
 import { setProfile } from '~/lib/stores/profile';
 import { getConvexProfile } from '~/lib/convexProfile';
 import { useLDClient, withLDProvider, basicLogger } from 'launchdarkly-react-client-sdk';
 import { api } from '@convex/_generated/api';
-import { useAuth } from '@workos-inc/authkit-react';
+// Auth actions moved to other components that need them
+// import { useAuthActions } from '@convex-dev/auth/react';
 
-export const UserProvider = withLDProvider<any>({
-  clientSideID: import.meta.env.VITE_LD_CLIENT_SIDE_ID,
-  options: {
-    logger: basicLogger({ level: 'error' }),
-  },
-})(UserProviderInner);
+// Conditionally wrap with LaunchDarkly provider only if client ID is available
+const ldClientSideId = import.meta.env.VITE_LD_CLIENT_SIDE_ID;
+export const UserProvider = ldClientSideId
+  ? withLDProvider<any>({
+      clientSideID: ldClientSideId,
+      options: {
+        logger: basicLogger({ level: 'error' }),
+      },
+    })(UserProviderInner)
+  : UserProviderInner;
 
 function UserProviderInner({ children }: { children: React.ReactNode }) {
   const launchdarkly = useLDClient();
-  const { user } = useAuth();
   const convexMemberId = useQuery(api.sessions.convexMemberId);
+  const userProfile = useQuery(api.sessions.getUserProfile);
   const sessionId = useConvexSessionIdOrNullOrLoading();
   const chatId = useChatId();
   const convex = useConvex();
@@ -38,40 +43,46 @@ function UserProviderInner({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     async function updateProfile() {
-      if (user) {
+      if (userProfile) {
         launchdarkly?.identify({
           key: convexMemberId ?? '',
-          email: user.email ?? '',
+          email: userProfile.email ?? '',
         });
         setUser({
           id: convexMemberId ?? '',
-          username: user.firstName ? (user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName) : '',
-          email: user.email ?? undefined,
+          username: userProfile.name ?? '',
+          email: userProfile.email ?? undefined,
         });
 
-        // Get additional profile info from Convex
+        // Get additional profile info from Convex if user has connected their Convex account
         try {
-          const token = getConvexAuthToken(convex);
-          if (token) {
-            void convex.action(api.sessions.updateCachedProfile, { convexAuthToken: token });
-            const convexProfile = await getConvexProfile(token);
+          const convexOAuthToken = localStorage.getItem('convexProjectToken');
+          if (convexOAuthToken) {
+            void convex.action(api.sessions.updateCachedProfile, { convexAuthToken: convexOAuthToken });
+            const convexProfile = await getConvexProfile(convexOAuthToken);
             setProfile({
-              username:
-                convexProfile.name ??
-                (user.firstName ? (user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName) : ''),
-              email: convexProfile.email || user.email || '',
-              avatar: user.profilePictureUrl || '',
-              id: convexProfile.id || user.id || '',
+              username: convexProfile.name ?? userProfile.name ?? '',
+              email: convexProfile.email || userProfile.email || '',
+              avatar: typeof userProfile.image === 'string' ? userProfile.image : '',
+              id: convexProfile.id || String(userProfile.id) || '',
+            });
+          } else {
+            // User hasn't connected Convex account yet, use auth profile
+            setProfile({
+              username: typeof userProfile.name === 'string' ? userProfile.name : '',
+              email: typeof userProfile.email === 'string' ? userProfile.email : '',
+              avatar: typeof userProfile.image === 'string' ? userProfile.image : '',
+              id: userProfile.id ? String(userProfile.id) : '',
             });
           }
         } catch (error) {
           console.error('Failed to fetch Convex profile:', error);
-          // Fallback to WorkOS profile if Convex profile fetch fails
+          // Fallback to user profile
           setProfile({
-            username: user.firstName ? (user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName) : '',
-            email: user.email ?? '',
-            avatar: user.profilePictureUrl ?? '',
-            id: user.id ?? '',
+            username: typeof userProfile.name === 'string' ? userProfile.name : '',
+            email: typeof userProfile.email === 'string' ? userProfile.email : '',
+            avatar: typeof userProfile.image === 'string' ? userProfile.image : '',
+            id: userProfile.id ? String(userProfile.id) : '',
           });
         }
       } else {
@@ -82,7 +93,7 @@ function UserProviderInner({ children }: { children: React.ReactNode }) {
     }
     void updateProfile();
     // Including tokenValue is important here even though it's not a direct dependency
-  }, [launchdarkly, user, convex, tokenValue, convexMemberId]);
+  }, [launchdarkly, userProfile, convex, tokenValue, convexMemberId]);
 
   return children;
 }

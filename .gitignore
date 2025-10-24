@@ -61,3 +61,7 @@ template/pnpm-lock.yaml
 .env*.local
 
 temp_envars
+
+# Don't push private keys
+private_key.pem
+public_key.pem

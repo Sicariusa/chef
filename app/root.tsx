@@ -10,8 +10,7 @@ import { useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ClientOnly } from 'remix-utils/client-only';
-import { AuthKitProvider, useAuth } from '@workos-inc/authkit-react';
-import { ConvexProviderWithAuthKit } from '@convex-dev/workos';
+import { ConvexAuthProvider } from '@convex-dev/auth/react';
 import { ConvexReactClient } from 'convex/react';
 import globalStyles from './styles/index.css?url';
 import '@convex-dev/design-system/styles/shared.css';
@@ -28,10 +27,8 @@ export async function loader() {
   // eslint-disable-next-line local/no-direct-process-env
   const CONVEX_URL = process.env.VITE_CONVEX_URL || globalThis.process.env.CONVEX_URL!;
   const CONVEX_OAUTH_CLIENT_ID = globalThis.process.env.CONVEX_OAUTH_CLIENT_ID!;
-  const WORKOS_REDIRECT_URI =
-    globalThis.process.env.VITE_WORKOS_REDIRECT_URI || globalThis.process.env.VERCEL_BRANCH_URL!;
   return json({
-    ENV: { CONVEX_URL, CONVEX_OAUTH_CLIENT_ID, WORKOS_REDIRECT_URI },
+    ENV: { CONVEX_URL, CONVEX_OAUTH_CLIENT_ID },
   });
 }
 
@@ -108,7 +105,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     document.querySelector('html')?.setAttribute('class', theme);
   }, [theme]);
 
-  // Initialize PostHog.
+  // Initialize PostHog (optional analytics).
   useEffect(() => {
     if (window.location.pathname.startsWith('/admin/')) {
       // Don't log in admin routes, there's a big perf penalty somehow.
@@ -118,6 +115,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
     // write-only and PostHog says is safe to use in public apps.
     const key = import.meta.env.VITE_POSTHOG_KEY || '';
     const apiHost = import.meta.env.VITE_POSTHOG_HOST || '';
+
+    // Only initialize PostHog if key is provided
+    if (!key) {
+      return;
+    }
 
     // See https://posthog.com/docs/libraries/js#config
     posthog.init(key, {
@@ -138,23 +140,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <AuthKitProvider
-        clientId={import.meta.env.VITE_WORKOS_CLIENT_ID}
-        redirectUri={globalThis.process.env.WORKOS_REDIRECT_URI}
-        apiHostname={import.meta.env.VITE_WORKOS_API_HOSTNAME}
-      >
-        <ClientOnly>
-          {() => {
-            return (
-              <DndProvider backend={HTML5Backend}>
-                <ConvexProviderWithAuthKit client={convex} useAuth={useAuth}>
-                  {children}
-                </ConvexProviderWithAuthKit>
-              </DndProvider>
-            );
-          }}
-        </ClientOnly>
-      </AuthKitProvider>
+      <ClientOnly>
+        {() => {
+          return (
+            <DndProvider backend={HTML5Backend}>
+              <ConvexAuthProvider client={convex}>{children}</ConvexAuthProvider>
+            </DndProvider>
+          );
+        }}
+      </ClientOnly>
 
       <ScrollRestoration />
       <Scripts />

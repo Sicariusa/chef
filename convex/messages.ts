@@ -27,16 +27,10 @@ export const initializeChat = mutation({
   args: {
     sessionId: v.id("sessions"),
     id: v.string(),
-    projectInitParams: v.optional(
-      v.object({
-        teamSlug: v.string(),
-        workosAccessToken: v.string(),
-      }),
-    ),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const { id, sessionId, projectInitParams } = args;
+    const { id, sessionId } = args;
     let existing = await getChatByIdOrUrlIdEnsuringAccess(ctx, { id: args.id, sessionId: args.sessionId });
 
     if (existing) {
@@ -46,7 +40,6 @@ export const initializeChat = mutation({
     await createNewChat(ctx, {
       id,
       sessionId,
-      projectInitParams,
     });
   },
 });
@@ -727,13 +720,9 @@ export async function createNewChat(
   args: {
     id: string;
     sessionId: Id<"sessions">;
-    projectInitParams?: {
-      teamSlug: string;
-      workosAccessToken: string;
-    };
   },
 ): Promise<Id<"chats">> {
-  const { id, sessionId, projectInitParams } = args;
+  const { id, sessionId } = args;
   const existing = await getChatByIdOrUrlIdEnsuringAccess(ctx, { id, sessionId });
 
   if (existing) {
@@ -763,7 +752,6 @@ export async function createNewChat(
   await startProvisionConvexProjectHelper(ctx, {
     sessionId,
     chatId: id,
-    projectInitParams,
   });
 
   return chatId;

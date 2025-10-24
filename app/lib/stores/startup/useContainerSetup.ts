@@ -16,7 +16,6 @@ import type { WebContainer } from '@webcontainer/api';
 import { queryEnvVariableWithRetries, setEnvVariablesWithRetries } from 'chef-agent/convexEnvVariables';
 import { getConvexSiteUrl } from '~/lib/convexSiteUrl';
 import { workbenchStore } from '~/lib/stores/workbench.client';
-import { initializeConvexAuth } from 'chef-agent/convexAuth';
 import { appendEnvVarIfNotSet } from '~/utils/envFileUtils';
 import { getFileUpdateCounter } from '~/lib/stores/fileUpdateCounter';
 import { chatSyncState } from './chatSyncState';
@@ -112,8 +111,6 @@ async function setupContainer(
   await setupConvexEnvVars(container, convexProject);
   await setupOpenAIToken(convex, convexProject);
   await setupResendToken(convex, convexProject);
-  setContainerBootState(ContainerBootState.CONFIGURING_CONVEX_AUTH);
-  await initializeConvexAuth(convexProject);
 
   setContainerBootState(ContainerBootState.STARTING_BACKUP);
   await initializeFileSystemBackup();

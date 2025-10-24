@@ -2,13 +2,16 @@ import { useStore } from '@nanostores/react';
 import { profileStore } from '~/lib/stores/profile';
 import { ExitIcon, ExternalLinkIcon, PersonIcon } from '@radix-ui/react-icons';
 import { LoadingTransition } from '@ui/Loading';
-import { useAuth } from '@workos-inc/authkit-react';
+import { useAuthActions } from '@convex-dev/auth/react';
+import { SESSION_ID_KEY } from '~/components/chat/ChefAuthWrapper';
 
 export function ProfileCard() {
   const profile = useStore(profileStore);
-  const { signOut } = useAuth();
+  const { signOut } = useAuthActions();
   const handleLogout = () => {
-    signOut({ returnTo: window.location.origin });
+    window.localStorage.removeItem(SESSION_ID_KEY);
+    void signOut();
+    window.location.href = '/';
   };
 
   return (
