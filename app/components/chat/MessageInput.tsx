@@ -19,7 +19,6 @@ import { classNames } from '~/utils/classNames';
 import { ConvexConnection } from '~/components/convex/ConvexConnection';
 import { PROMPT_COOKIE_KEY, type ModelSelection } from '~/utils/constants';
 import { ModelSelector } from './ModelSelector';
-import { TeamSelector } from '~/components/convex/TeamSelector';
 import { ArrowRightIcon, ExclamationTriangleIcon, MagnifyingGlassIcon, StopIcon } from '@radix-ui/react-icons';
 import { SquaresPlusIcon } from '@heroicons/react/24/outline';
 import { Tooltip } from '@ui/Tooltip';
@@ -152,7 +151,7 @@ export const MessageInput = memo(function MessageInput({
 
   const handleKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = useCallback(
     (event) => {
-      if (event.key === 'Enter' && selectedTeamSlug) {
+      if (event.key === 'Enter') {
         if (event.shiftKey) {
           return;
         }
@@ -172,7 +171,7 @@ export const MessageInput = memo(function MessageInput({
         handleSend();
       }
     },
-    [selectedTeamSlug, handleSend, isStreaming, onStop],
+    [handleSend, isStreaming, onStop],
   );
 
   const handleChange: ChangeEventHandler<HTMLTextAreaElement> = useCallback((event) => {
@@ -187,7 +186,9 @@ export const MessageInput = memo(function MessageInput({
 
       const token = getConvexOAuthToken();
       if (!token) {
-        throw new Error('No Convex OAuth token - please connect your Convex account');
+        // In shared mode, enhance prompt is not available
+        toast.info('Prompt enhancement is not available in this mode');
+        return;
       }
       const response = await fetch('/api/enhance-prompt', {
         method: 'POST',
@@ -280,15 +281,8 @@ export const MessageInput = memo(function MessageInput({
           {chefAuthState.kind === 'fullyLoggedIn' && (
             <ModelSelector modelSelection={modelSelection} setModelSelection={setModelSelection} size="sm" />
           )}
-          {!chatStarted && sessionId && (
-            <TeamSelector
-              description="Your project will be created in this Convex team"
-              selectedTeamSlug={selectedTeamSlug}
-              setSelectedTeamSlug={setSelectedTeamSlug}
-              size="sm"
-            />
-          )}
-          {chatStarted && <ConvexConnection />}
+          {/* TEMPORARY: ConvexConnection button for admin to get OAuth token - REMOVE AFTER GETTING TOKEN */}
+          {chefAuthState.kind === 'fullyLoggedIn' && <ConvexConnection />}
           {input.length > 3 && input.length <= PROMPT_LENGTH_WARNING_THRESHOLD && <NewLineShortcut />}
           {input.length > PROMPT_LENGTH_WARNING_THRESHOLD && <CharacterWarning />}
           <div className="ml-auto flex items-center gap-1">
@@ -344,14 +338,13 @@ export const MessageInput = memo(function MessageInput({
             {chefAuthState.kind === 'fullyLoggedIn' && (
               <EnhancePromptButton
                 isEnhancing={isEnhancing}
-                disabled={!selectedTeamSlug || disabled || input.length === 0}
+                disabled={disabled || input.length === 0}
                 onClick={enhancePrompt}
               />
             )}
             <Button
               disabled={
                 (!isStreaming && input.length === 0) ||
-                !selectedTeamSlug ||
                 chefAuthState.kind === 'loading' ||
                 sendMessageInProgress ||
                 disabled
@@ -359,9 +352,7 @@ export const MessageInput = memo(function MessageInput({
               tip={
                 chefAuthState.kind === 'unauthenticated'
                   ? 'Please sign in to continue'
-                  : !selectedTeamSlug
-                    ? 'Please select a team to continue'
-                    : undefined
+                  : undefined
               }
               onClick={handleClickButton}
               size="xs"

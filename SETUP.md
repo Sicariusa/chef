@@ -1,13 +1,39 @@
-# Chef Multi-Tenant Setup Guide
+# Chef Setup Guide
 
-This guide will help you set up and run Chef as a multi-tenant application where users sign in with Google or GitHub.
+This guide will help you set up and run Chef with centralized project management.
 
-## What This Does
+## What This Does (Shared Project Model)
 
-- Users sign in with **Google** or **GitHub**
+**For Your End Users (Simple!):**
+- Sign in with **Google** or **GitHub** ✅
+- Start building immediately - no setup! ✅
+- See only their own projects ✅
+- Never deal with Convex accounts, tokens, or OAuth ✅
+
+**For You (The Admin - One-Time Setup):**
+- All projects are created in **your Convex account**
+- **You pay for all usage** (simplified billing)
+- One-time setup with your admin credentials
+
+### User Flow (Shared Model)
+
+```
+👤 User → Signs in with Google/GitHub → Starts chatting → Done! ✅
+
+Behind the scenes:
+👤 User request → 🔧 Chef Backend → Uses YOUR admin token → Creates project in YOUR Convex account
+```
+
+---
+
+## Alternative: Multi-Tenant Setup
+
+If you want each user to have their own Convex account:
 - Each user connects **their own Convex account**
 - Each user creates **their own projects**
 - Each user **pays for their own usage**
+
+See the Multi-Tenant section at the bottom of this document.
 
 ## Prerequisites
 
@@ -47,7 +73,33 @@ This guide will help you set up and run Chef as a multi-tenant application where
 5. Click **Generate a new client secret**
 6. Save the **Client ID** and **Client Secret**
 
-### 2. Create Convex OAuth Application
+### 2. Get Your Convex Admin Access Token (For Shared Model)
+
+**⚠️ YOU (THE ADMIN) DO THIS ONCE - NOT YOUR USERS!**
+
+This token allows Chef to automatically create projects in your Convex account for all users.
+Your users will just sign in with Google/GitHub and start using Chef immediately.
+
+1. Log into [Convex Dashboard](https://dashboard.convex.dev)
+2. Open your browser's Developer Tools (F12 or Cmd+Option+I)
+3. Go to the **Console** tab
+4. Run this command:
+   ```javascript
+   localStorage.getItem('convexProjectToken')
+   ```
+5. Copy the token (it's a long string that looks like `eyJ...`)
+6. Save this as your `CHEF_ADMIN_ACCESS_TOKEN` (you'll add it to environment variables in step 6)
+7. Note your team slug from the dashboard URL (e.g., `dashboard.convex.dev/t/YOUR_TEAM_SLUG`)
+8. Save the team slug as your `CHEF_ADMIN_TEAM_SLUG` (you'll add it to environment variables in step 6)
+
+**Important**: 
+- This token gives full access to your Convex account. Keep it secure!
+- You only do this once during setup
+- Your end users never see this token or do any Convex setup
+
+### 3. (Optional) Create Convex OAuth Application (For Multi-Tenant Model)
+
+Skip this if you're using the shared project model. Otherwise:
 
 1. Go to [Convex Dashboard](https://dashboard.convex.dev/team/settings/applications/oauth-apps)
 2. Click **Create OAuth Application**
@@ -58,7 +110,7 @@ This guide will help you set up and run Chef as a multi-tenant application where
 4. Click **Create**
 5. Save the **OAuth Client ID** and **OAuth Client Secret**
 
-### 3. Clone and Install
+### 4. Clone and Install
 
 ```bash
 # Clone the repository
@@ -76,7 +128,7 @@ npm install -g pnpm
 pnpm install
 ```
 
-### 4. Setup Convex Backend
+### 5. Setup Convex Backend
 
 ```bash
 # Create .env.local file
@@ -91,7 +143,7 @@ Follow the prompts to:
 - Create a new project or select existing
 - Choose your team
 
-### 5. Configure Environment Variables
+### 6. Configure Environment Variables
 
 #### In Convex Dashboard
 
@@ -100,11 +152,18 @@ Follow the prompts to:
 3. Add these variables:
 
 ```bash
-# Convex OAuth (from Step 2)
-CONVEX_OAUTH_CLIENT_ID=<your-convex-oauth-client-id>
-CONVEX_OAUTH_CLIENT_SECRET=<your-convex-oauth-client-secret>
+# === FOR SHARED PROJECT MODEL ===
+# Admin credentials (from Step 2)
+CHEF_ADMIN_ACCESS_TOKEN=<your-convex-access-token-from-step-2>
+CHEF_ADMIN_TEAM_SLUG=<your-team-slug-from-step-2>
 PROVISION_HOST=https://api.convex.dev
 
+# === FOR MULTI-TENANT MODEL (OPTIONAL) ===
+# Convex OAuth (from Step 3, skip if using shared model)
+# CONVEX_OAUTH_CLIENT_ID=<your-convex-oauth-client-id>
+# CONVEX_OAUTH_CLIENT_SECRET=<your-convex-oauth-client-secret>
+
+# === USER AUTHENTICATION (REQUIRED) ===
 # Google OAuth (from Step 1)
 AUTH_GOOGLE_ID=<your-google-client-id>
 AUTH_GOOGLE_SECRET=<your-google-client-secret>
@@ -116,9 +175,14 @@ AUTH_GITHUB_SECRET=<your-github-client-secret>
 
 #### In .env.local File
 
-Edit `.env.local` and add at least one AI API key:
+Edit `.env.local` and add:
 
 ```bash
+# === FOR MULTI-TENANT MODEL (OPTIONAL) ===
+# If you set up Convex OAuth in Step 3, add the Client ID here:
+# VITE_CONVEX_OAUTH_CLIENT_ID=<your-convex-oauth-client-id>
+
+# === AI API KEYS (REQUIRED) ===
 # At least one of these is required:
 ANTHROPIC_API_KEY=sk-ant-...
 OPENAI_API_KEY=sk-...
@@ -133,7 +197,7 @@ VITE_POSTHOG_HOST=...
 VITE_LD_CLIENT_SIDE_ID=...
 ```
 
-### 6. Run Chef
+### 7. Run Chef
 
 Open two terminals:
 
@@ -149,7 +213,24 @@ npx convex dev
 pnpm run dev
 ```
 
-### 7. Test It!
+### 8. Test It!
+
+#### For Shared Project Model (Simple User Experience):
+
+**What your users see:**
+
+1. Open http://127.0.0.1:5173 in your browser
+2. Click **"Sign in with Google"** (or GitHub)
+3. Authorize the app
+4. Start typing a message and start building! 🎉
+
+**That's it!** Behind the scenes:
+- Projects are automatically created in YOUR (the admin's) Convex account
+- Users only see their own projects
+- Users never deal with Convex tokens or OAuth
+- You (the admin) pay for all usage
+
+#### For Multi-Tenant Model:
 
 1. Open http://127.0.0.1:5173 in your browser
 2. Click **"Sign in with Google"** (or GitHub)

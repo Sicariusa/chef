@@ -29,7 +29,6 @@ export async function createChat(t: TestConvex) {
   await t.mutation(api.messages.initializeChat, {
     id: chatId,
     sessionId,
-    projectInitParams: testProjectInitParams,
   });
   return { sessionId, chatId };
 }

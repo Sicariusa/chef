@@ -87,12 +87,6 @@ export const startProvisionConvexProject = mutation({
   args: {
     sessionId: v.id("sessions"),
     chatId: v.string(),
-    projectInitParams: v.optional(
-      v.object({
-        teamSlug: v.string(),
-        workosAccessToken: v.string(),
-      }),
-    ),
   },
   handler: async (ctx, args) => {
     await startProvisionConvexProjectHelper(ctx, args);
@@ -104,10 +98,6 @@ export async function startProvisionConvexProjectHelper(
   args: {
     sessionId: Id<"sessions">;
     chatId: string;
-    projectInitParams?: {
-      teamSlug: string;
-      workosAccessToken: string;
-    };
   },
 ): Promise<void> {
   const chat = await getChatByIdOrUrlIdEnsuringAccess(ctx, { id: args.chatId, sessionId: args.sessionId });
@@ -122,17 +112,11 @@ export async function startProvisionConvexProjectHelper(
   if (session.memberId === undefined) {
     throw new ConvexError({ code: "NotAuthorized", message: "Must be logged in to connect a project" });
   }
-  // OAuth flow
-  if (args.projectInitParams === undefined) {
-    console.error(`Must provide projectInitParams for oauth: ${args.sessionId}`);
-    throw new ConvexError({ code: "NotAuthorized", message: "Invalid flow for connecting a project" });
-  }
 
-  await ctx.scheduler.runAfter(0, internal.convexProjects.connectConvexProjectForOauth, {
+  // Use admin credentials from environment variables
+  await ctx.scheduler.runAfter(0, internal.convexProjects.connectConvexProjectWithAdminCredentials, {
     sessionId: args.sessionId,
     chatId: args.chatId,
-    accessToken: args.projectInitParams.workosAccessToken,
-    teamSlug: args.projectInitParams.teamSlug,
   });
   const jobId = await ctx.scheduler.runAfter(CHECK_CONNECTION_DEADLINE_MS, internal.convexProjects.checkConnection, {
     sessionId: args.sessionId,
@@ -187,6 +171,49 @@ export const recordProvisionedConvexProjectCredentials = internalMutation({
 const TOTAL_WAIT_TIME_MS = 5000;
 const WAIT_TIME_MS = 500;
 
+export const connectConvexProjectWithAdminCredentials = internalAction({
+  args: {
+    sessionId: v.id("sessions"),
+    chatId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Get admin credentials from environment variables
+    // Note: CHEF_ADMIN_ACCESS_TOKEN should be an OAuth access token, not a deploy key
+    // You can get this by going through the OAuth flow once and copying the token
+    const adminAccessToken = ensureEnvVar("CHEF_ADMIN_ACCESS_TOKEN");
+    const adminTeamSlug = ensureEnvVar("CHEF_ADMIN_TEAM_SLUG");
+    
+    await _connectConvexProjectForMember(ctx, {
+      sessionId: args.sessionId,
+      chatId: args.chatId,
+      accessToken: adminAccessToken,
+      teamSlug: adminTeamSlug,
+    })
+      .then(async (data) => {
+        await ctx.runMutation(internal.convexProjects.recordProvisionedConvexProjectCredentials, {
+          sessionId: args.sessionId,
+          chatId: args.chatId,
+          projectSlug: data.projectSlug,
+          teamSlug: adminTeamSlug,
+          projectDeployKey: data.projectDeployKey,
+          deploymentUrl: data.deploymentUrl,
+          deploymentName: data.deploymentName,
+          warningMessage: data.warningMessage,
+        });
+      })
+      .catch(async (error) => {
+        console.error(`Error connecting convex project: ${error.message}`);
+        const errorMessage = error instanceof ConvexError ? error.data.message : "Unexpected error";
+        await ctx.runMutation(internal.convexProjects.recordFailedConvexProjectConnection, {
+          sessionId: args.sessionId,
+          chatId: args.chatId,
+          errorMessage,
+        });
+      });
+  },
+});
+
+// Keep the old OAuth function for backward compatibility (if needed)
 export const connectConvexProjectForOauth = internalAction({
   args: {
     sessionId: v.id("sessions"),

@@ -1,4 +1,4 @@
-import { getConvexOAuthToken, waitForConvexSessionId } from '~/lib/stores/sessionId';
+import { waitForConvexSessionId } from '~/lib/stores/sessionId';
 import { json } from '@vercel/remix';
 import type { LoaderFunctionArgs } from '@vercel/remix';
 import { useMutation, useConvex, useQuery } from 'convex/react';
@@ -6,9 +6,6 @@ import { api } from '@convex/_generated/api';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { Toaster } from '~/components/ui/Toaster';
-import { setSelectedTeamSlug, useSelectedTeamSlug, waitForSelectedTeamSlug } from '~/lib/stores/convexTeams';
-import { TeamSelector } from '~/components/convex/TeamSelector';
-import { useTeamsInitializer } from '~/lib/stores/startup/useTeamsInitializer';
 import { ChefAuthProvider, useChefAuth } from '~/components/chat/ChefAuthWrapper';
 import { useParams } from '@remix-run/react';
 import { Loading } from '~/components/Loading';
@@ -60,28 +57,15 @@ function ShareProjectContent() {
     throw new Error('shareCode is required');
   }
 
-  useTeamsInitializer();
   const chefAuthState = useChefAuth();
-
   const cloneChat = useMutation(api.share.clone);
-  const convex = useConvex();
   const getShareDescription = useQuery(api.share.getShareDescription, { code: shareCode });
 
   const handleCloneChat = useCallback(async () => {
     const sessionId = await waitForConvexSessionId('useInitializeChat');
-    const teamSlug = await waitForSelectedTeamSlug('useInitializeChat');
-    const convexAccessToken = getConvexOAuthToken();
-    if (!convexAccessToken) {
-      console.error('No Convex OAuth token - user needs to connect their Convex account');
-      toast.error('Please connect your Convex account first');
-      return;
-    }
-    const projectInitParams = {
-      teamSlug,
-      workosAccessToken: convexAccessToken,
-    };
+    
     try {
-      const { id: chatId } = await cloneChat({ shareCode, sessionId, projectInitParams });
+      const { id: chatId } = await cloneChat({ shareCode, sessionId });
       window.location.href = `/chat/${chatId}`;
     } catch (e) {
       if (e instanceof ConvexError) {
@@ -90,9 +74,7 @@ function ShareProjectContent() {
         toast.error('Unexpected error cloning chat');
       }
     }
-  }, [convex, cloneChat, shareCode]);
-
-  const selectedTeamSlug = useSelectedTeamSlug();
+  }, [cloneChat, shareCode]);
 
   if (chefAuthState.kind === 'loading') {
     return <Loading />;
@@ -134,23 +116,14 @@ function ShareProjectContent() {
         <div className="space-y-2 text-center">
           <h1 className="text-center font-semibold">Clone Project</h1>
           {getShareDescription?.description && <p className="text-base">{getShareDescription.description}</p>}
-        </div>
-
-        <div className="flex flex-col items-center space-y-4">
-          <div className="space-y-2">
-            <h2 className="text-center">Select Team</h2>
-            <p className="text-center text-sm text-content-secondary">Choose where to clone this project</p>
-          </div>
-
-          {chefAuthState.kind === 'fullyLoggedIn' && (
-            <TeamSelector selectedTeamSlug={selectedTeamSlug} setSelectedTeamSlug={setSelectedTeamSlug} />
-          )}
+          <p className="text-sm text-content-secondary">
+            This will create a copy of this project in your Chef account
+          </p>
         </div>
 
         <Button
           className="flex w-full items-center justify-center gap-2 px-6 py-3"
           onClick={handleCloneChat}
-          disabled={!selectedTeamSlug}
         >
           Clone Project
         </Button>

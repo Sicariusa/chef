@@ -1,7 +1,5 @@
-import { selectedTeamSlugStore, waitForSelectedTeamSlug } from '~/lib/stores/convexTeams';
-
 import { useConvex } from 'convex/react';
-import { getConvexOAuthToken, waitForConvexSessionId } from '~/lib/stores/sessionId';
+import { waitForConvexSessionId } from '~/lib/stores/sessionId';
 import { useCallback } from 'react';
 import { api } from '@convex/_generated/api';
 import { useChefAuth } from '~/components/chat/ChefAuthWrapper';
@@ -24,30 +22,11 @@ export function useHomepageInitializeChat(chatId: string, setChatInitialized: (c
       return false;
     }
     const sessionId = await waitForConvexSessionId('useInitializeChat');
-    const selectedTeamSlug = selectedTeamSlugStore.get();
-    if (selectedTeamSlug === null) {
-      // If the user hasn't selected a team, don't initialize the chat.
-      return false;
-    }
 
-    const convexAccessToken = getConvexOAuthToken();
-    if (!convexAccessToken) {
-      console.error('No Convex OAuth token - user needs to connect their Convex account');
-      toast.error('Please connect your Convex account first');
-      return false;
-    }
-    const teamSlug = await waitForSelectedTeamSlug('useInitializeChat');
-
-    const projectInitParams = {
-      teamSlug,
-      workosAccessToken: convexAccessToken,
-    };
-
-    // Initialize the chat and start project creation
+    // Initialize the chat and start project creation (backend uses admin credentials)
     await convex.mutation(api.messages.initializeChat, {
       id: chatId,
       sessionId,
-      projectInitParams,
     });
 
     try {
@@ -81,21 +60,11 @@ export function useExistingInitializeChat(chatId: string) {
   const convex = useConvex();
   return useCallback(async () => {
     const sessionId = await waitForConvexSessionId('useInitializeChat');
-    const teamSlug = await waitForSelectedTeamSlug('useInitializeChat');
-    const convexAccessToken = getConvexOAuthToken();
-    if (!convexAccessToken) {
-      console.error('No Convex OAuth token - user needs to connect their Convex account');
-      toast.error('Please connect your Convex account first');
-      return false;
-    }
-    const projectInitParams = {
-      teamSlug,
-      workosAccessToken: convexAccessToken,
-    };
+    
+    // Initialize the chat (backend uses admin credentials)
     await convex.mutation(api.messages.initializeChat, {
       id: chatId,
       sessionId,
-      projectInitParams,
     });
 
     // We don't need to wait for container boot here since we don't mount
