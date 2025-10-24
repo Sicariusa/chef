@@ -47,7 +47,8 @@ async function isValidSessionForConvexOAuth(
     return true;
   }
   // But if we have the identity, it better match
-  return identity.convex_member_id === member.convexMemberId;
+  // Check both convex_member_id (for old WorkOS users) and tokenIdentifier (for new Convex Auth users)
+  return identity.convex_member_id === member.convexMemberId || identity.tokenIdentifier === member.tokenIdentifier;
 }
 
 export const registerConvexOAuthConnection = internalMutation({
@@ -119,6 +120,17 @@ async function getOrCreateCurrentMember(ctx: MutationCtx) {
   if (!identity) {
     throw new ConvexError({ code: "NotAuthorized", message: "Unauthorized" });
   }
+  // Try to find by tokenIdentifier first (more reliable for Convex Auth)
+  const memberByToken = await ctx.db
+    .query("convexMembers")
+    .withIndex("byTokenIdentifier", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+    .first();
+
+  if (memberByToken) {
+    return memberByToken._id;
+  }
+
+  // Fallback to convexMemberId for legacy users
   const existingMembers = await getMemberByConvexMemberIdQuery(ctx, identity).collect();
   const existingMember = existingMembers[0];
   if (existingMembers.length > 1) {
@@ -185,9 +197,12 @@ async function getOrCreateCurrentMember(ctx: MutationCtx) {
   if (existingMember) {
     return existingMember._id;
   }
+  // For Convex Auth users, use subject as convexMemberId
+  // For legacy WorkOS users, use convex_member_id if it exists
+  const convexMemberId = (identity.convex_member_id as string | undefined) ?? identity.subject;
   return ctx.db.insert("convexMembers", {
     tokenIdentifier: identity.tokenIdentifier,
-    convexMemberId: identity.convex_member_id as string | undefined,
+    convexMemberId: convexMemberId,
   });
 }
 
@@ -197,9 +212,10 @@ export const convexMemberId = query({
     if (!identity) {
       return null;
     }
+    const convexMemberId = (identity.convex_member_id as string | undefined) ?? identity.subject;
     const existingMember = await ctx.db
       .query("convexMembers")
-      .withIndex("byConvexMemberId", (q) => q.eq("convexMemberId", identity.convex_member_id as string))
+      .withIndex("byConvexMemberId", (q) => q.eq("convexMemberId", convexMemberId))
       .first();
 
     return existingMember?.convexMemberId;
@@ -226,9 +242,10 @@ export async function getCurrentMember(ctx: QueryCtx) {
   if (!identity) {
     throw new ConvexError({ code: "NotAuthorized", message: "Unauthorized" });
   }
+  const convexMemberId = (identity.convex_member_id as string | undefined) ?? identity.subject;
   const existingMember = await ctx.db
     .query("convexMembers")
-    .withIndex("byConvexMemberId", (q) => q.eq("convexMemberId", identity.convex_member_id as string))
+    .withIndex("byConvexMemberId", (q) => q.eq("convexMemberId", convexMemberId))
     .first();
   if (!existingMember) {
     throw new ConvexError({ code: "NotAuthorized", message: "Unauthorized" });
@@ -308,9 +325,8 @@ export interface ConvexProfile {
 }
 
 export function getMemberByConvexMemberIdQuery(ctx: QueryCtx, identity: UserIdentity) {
+  const convexMemberId = (identity.convex_member_id as string | undefined) ?? identity.subject;
   return ctx.db
     .query("convexMembers")
-    .withIndex("byConvexMemberId", (q) =>
-      q.eq("convexMemberId", identity.convex_member_id as string).lt("softDeletedForWorkOSMerge", true),
-    );
+    .withIndex("byConvexMemberId", (q) => q.eq("convexMemberId", convexMemberId).lt("softDeletedForWorkOSMerge", true));
 }
