@@ -1,4 +1,4 @@
-import { getConvexAuthToken, waitForConvexSessionId } from '~/lib/stores/sessionId';
+import { getConvexOAuthToken, waitForConvexSessionId } from '~/lib/stores/sessionId';
 import { json } from '@vercel/remix';
 import type { LoaderFunctionArgs } from '@vercel/remix';
 import { useMutation, useConvex, useQuery } from 'convex/react';
@@ -70,10 +70,10 @@ function ShareProjectContent() {
   const handleCloneChat = useCallback(async () => {
     const sessionId = await waitForConvexSessionId('useInitializeChat');
     const teamSlug = await waitForSelectedTeamSlug('useInitializeChat');
-    const convexAccessToken = getConvexAuthToken(convex);
+    const convexAccessToken = getConvexOAuthToken();
     if (!convexAccessToken) {
-      console.error('No Convex access token');
-      toast.error('Unexpected error cloning chat');
+      console.error('No Convex OAuth token - user needs to connect their Convex account');
+      toast.error('Please connect your Convex account first');
       return;
     }
     const projectInitParams = {

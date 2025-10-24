@@ -1,4 +1,4 @@
-import { getConvexAuthToken, useConvexSessionId } from '~/lib/stores/sessionId';
+import { useConvexSessionId } from '~/lib/stores/sessionId';
 import { setSelectedTeamSlug, useSelectedTeamSlug } from '~/lib/stores/convexTeams';
 import { useConvex, useQuery } from 'convex/react';
 import { api } from '@convex/_generated/api';
@@ -22,9 +22,9 @@ export function ConvexConnectButton() {
       console.error('No team selected');
       return;
     }
-    const convexAccessToken = getConvexAuthToken(convexClient);
-    if (!convexAccessToken) {
-      console.error('No Convex access token');
+    const convexOAuthToken = localStorage.getItem('convexProjectToken');
+    if (!convexOAuthToken) {
+      console.error('No Convex OAuth token - user needs to complete OAuth flow first');
       return;
     }
     await convexClient.mutation(api.convexProjects.startProvisionConvexProject, {
@@ -32,7 +32,7 @@ export function ConvexConnectButton() {
       chatId,
       projectInitParams: {
         teamSlug: selectedTeamSlug,
-        workosAccessToken: convexAccessToken,
+        workosAccessToken: convexOAuthToken,
       },
     });
   };

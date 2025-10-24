@@ -105,7 +105,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     document.querySelector('html')?.setAttribute('class', theme);
   }, [theme]);
 
-  // Initialize PostHog.
+  // Initialize PostHog (optional analytics).
   useEffect(() => {
     if (window.location.pathname.startsWith('/admin/')) {
       // Don't log in admin routes, there's a big perf penalty somehow.
@@ -115,6 +115,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
     // write-only and PostHog says is safe to use in public apps.
     const key = import.meta.env.VITE_POSTHOG_KEY || '';
     const apiHost = import.meta.env.VITE_POSTHOG_HOST || '';
+
+    // Only initialize PostHog if key is provided
+    if (!key) {
+      return;
+    }
 
     // See https://posthog.com/docs/libraries/js#config
     posthog.init(key, {

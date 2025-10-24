@@ -4,17 +4,14 @@ import { queryEnvVariableWithRetries, setEnvVariablesWithRetries } from './conve
 import { logger } from './utils/logger.js';
 
 export async function initializeConvexAuth(project: ConvexProject) {
-  const SITE_URL = await queryEnvVariableWithRetries(project, 'SITE_URL');
+  const CONVEX_SITE_URL = await queryEnvVariableWithRetries(project, 'CONVEX_SITE_URL');
   const JWKS = await queryEnvVariableWithRetries(project, 'JWKS');
   const JWT_PRIVATE_KEY = await queryEnvVariableWithRetries(project, 'JWT_PRIVATE_KEY');
 
   const newEnv: Record<string, string> = {};
 
-  if (SITE_URL && SITE_URL !== 'http://127.0.0.1:5173') {
-    console.warn('SITE_URL is not http://127.0.0.1:5173');
-  }
-  if (!SITE_URL) {
-    newEnv.SITE_URL = 'http://127.0.0.1:5173';
+  if (!CONVEX_SITE_URL) {
+    newEnv.CONVEX_SITE_URL = 'http://127.0.0.1:5173';
   }
 
   if (!JWKS || !JWT_PRIVATE_KEY) {
@@ -22,22 +19,26 @@ export async function initializeConvexAuth(project: ConvexProject) {
     newEnv.JWKS = JSON.stringify(keys.JWKS);
     newEnv.JWT_PRIVATE_KEY = keys.JWT_PRIVATE_KEY;
   }
-  if (!SITE_URL) {
-    newEnv.SITE_URL = 'http://127.0.0.1:5173';
-  }
-  if (Object.entries(newEnv).length > 0) {
+
+  if (Object.keys(newEnv).length > 0) {
     await setEnvVariablesWithRetries(project, newEnv);
   }
-  logger.info('✅ Convex Auth setup!');
+
+  logger.info('✅ Convex Auth setup complete!');
 }
 
 async function generateKeys() {
-  const keys = await generateKeyPair('RS256', { extractable: true });
-  const privateKey = await exportPKCS8(keys.privateKey);
-  const publicKey = await exportJWK(keys.publicKey);
-  const jwks = { keys: [{ use: 'sig', ...publicKey }] };
+  const { publicKey, privateKey } = await generateKeyPair('RS256', { extractable: true });
+
+  // Export private key to PKCS#8 PEM string (already formatted by jose)
+  const pemPrivateKey = await exportPKCS8(privateKey);
+
+  // Export public key as JWK
+  const publicJwk = await exportJWK(publicKey);
+  const jwks = { keys: [{ use: 'sig', alg: 'RS256', ...publicJwk }] };
+
   return {
-    JWT_PRIVATE_KEY: privateKey,
+    JWT_PRIVATE_KEY: pemPrivateKey,
     JWKS: jwks,
   };
 }

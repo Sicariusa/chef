@@ -26,7 +26,7 @@ import { Tooltip } from '@ui/Tooltip';
 import { setSelectedTeamSlug, useSelectedTeamSlug } from '~/lib/stores/convexTeams';
 import { convexProjectStore } from '~/lib/stores/convexProject';
 import { useChefAuth } from './ChefAuthWrapper';
-import { getConvexAuthToken, useConvexSessionIdOrNullOrLoading } from '~/lib/stores/sessionId';
+import { getConvexOAuthToken, useConvexSessionIdOrNullOrLoading } from '~/lib/stores/sessionId';
 import { KeyboardShortcut } from '@ui/KeyboardShortcut';
 import { Button } from '@ui/Button';
 import { Spinner } from '@ui/Spinner';
@@ -185,9 +185,9 @@ export const MessageInput = memo(function MessageInput({
     try {
       setIsEnhancing(true);
 
-      const token = getConvexAuthToken(convex);
+      const token = getConvexOAuthToken();
       if (!token) {
-        throw new Error('No auth token');
+        throw new Error('No Convex OAuth token - please connect your Convex account');
       }
       const response = await fetch('/api/enhance-prompt', {
         method: 'POST',

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { setExtra, setUser } from '@sentry/remix';
 import { useConvex, useQuery } from 'convex/react';
-import { useConvexSessionIdOrNullOrLoading, getConvexAuthToken } from '~/lib/stores/sessionId';
+import { useConvexSessionIdOrNullOrLoading } from '~/lib/stores/sessionId';
 import { useChatId } from '~/lib/stores/chatId';
 import { setProfile } from '~/lib/stores/profile';
 import { getConvexProfile } from '~/lib/convexProfile';
@@ -10,12 +10,16 @@ import { api } from '@convex/_generated/api';
 // Auth actions moved to other components that need them
 // import { useAuthActions } from '@convex-dev/auth/react';
 
-export const UserProvider = withLDProvider<any>({
-  clientSideID: import.meta.env.VITE_LD_CLIENT_SIDE_ID,
-  options: {
-    logger: basicLogger({ level: 'error' }),
-  },
-})(UserProviderInner);
+// Conditionally wrap with LaunchDarkly provider only if client ID is available
+const ldClientSideId = import.meta.env.VITE_LD_CLIENT_SIDE_ID;
+export const UserProvider = ldClientSideId
+  ? withLDProvider<any>({
+      clientSideID: ldClientSideId,
+      options: {
+        logger: basicLogger({ level: 'error' }),
+      },
+    })(UserProviderInner)
+  : UserProviderInner;
 
 function UserProviderInner({ children }: { children: React.ReactNode }) {
   const launchdarkly = useLDClient();
@@ -50,17 +54,25 @@ function UserProviderInner({ children }: { children: React.ReactNode }) {
           email: userProfile.email ?? undefined,
         });
 
-        // Get additional profile info from Convex
+        // Get additional profile info from Convex if user has connected their Convex account
         try {
-          const token = getConvexAuthToken(convex);
-          if (token) {
-            void convex.action(api.sessions.updateCachedProfile, { convexAuthToken: token });
-            const convexProfile = await getConvexProfile(token);
+          const convexOAuthToken = localStorage.getItem('convexProjectToken');
+          if (convexOAuthToken) {
+            void convex.action(api.sessions.updateCachedProfile, { convexAuthToken: convexOAuthToken });
+            const convexProfile = await getConvexProfile(convexOAuthToken);
             setProfile({
               username: convexProfile.name ?? userProfile.name ?? '',
               email: convexProfile.email || userProfile.email || '',
               avatar: typeof userProfile.image === 'string' ? userProfile.image : '',
               id: convexProfile.id || String(userProfile.id) || '',
+            });
+          } else {
+            // User hasn't connected Convex account yet, use auth profile
+            setProfile({
+              username: typeof userProfile.name === 'string' ? userProfile.name : '',
+              email: typeof userProfile.email === 'string' ? userProfile.email : '',
+              avatar: typeof userProfile.image === 'string' ? userProfile.image : '',
+              id: userProfile.id ? String(userProfile.id) : '',
             });
           }
         } catch (error) {

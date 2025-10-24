@@ -86,6 +86,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
     const key = import.meta.env.VITE_POSTHOG_KEY || '';
     const apiHost = import.meta.env.VITE_POSTHOG_HOST || '';
 
+    // Only initialize PostHog if key is provided
+    if (!key) {
+      return;
+    }
+
     // See https://posthog.com/docs/libraries/js#config
     posthog.init(key, {
       api_host: apiHost,

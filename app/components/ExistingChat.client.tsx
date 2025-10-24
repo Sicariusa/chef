@@ -60,8 +60,6 @@ function ExistingChatWrapper({ chatId }: { chatId: string }) {
     loading = 'Setting up Convex project...';
   } else if (bootState.state === ContainerBootState.SETTING_UP_CONVEX_ENV_VARS) {
     loading = 'Setting up Convex environment variables...';
-  } else if (bootState.state === ContainerBootState.CONFIGURING_CONVEX_AUTH) {
-    loading = 'Configuring Convex auth...';
   } else if (bootState.state === ContainerBootState.STARTING_BACKUP) {
     loading = 'Starting backup...';
   } else if (bootState.state !== ContainerBootState.READY) {

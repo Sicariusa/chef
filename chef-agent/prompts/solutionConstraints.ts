@@ -212,11 +212,6 @@ function templateInfo() {
       The 'convex/' directory contains the code deployed to the Convex backend.
     </directory>
 
-    <file path="convex/auth.config.ts">
-      The 'auth.config.ts' file links Convex Auth to the Convex deployment.
-      IMPORTANT: Do NOT modify the \`convex/auth.config.ts\` file under any circumstances.
-    </file>
-
     <file path="convex/auth.ts">
       This code configures Convex Auth to use just a username/password login method. Do NOT modify this
       file. If the user asks to support other login methods, tell them that this isn't currently possible

@@ -1,5 +1,5 @@
 import type { ConvexReactClient } from 'convex/react';
-import { getConvexAuthToken } from './stores/sessionId';
+import { getConvexOAuthToken } from './stores/sessionId';
 import { VITE_PROVISION_HOST } from './convexProvisionHost';
 
 type OptInToAccept = {
@@ -22,8 +22,9 @@ export async function fetchOptIns(convex: ConvexReactClient): Promise<
       kind: 'missingAuth';
     }
 > {
-  const token = getConvexAuthToken(convex);
+  const token = getConvexOAuthToken();
   if (!token) {
+    // User hasn't connected their Convex account yet
     return {
       kind: 'missingAuth',
     };

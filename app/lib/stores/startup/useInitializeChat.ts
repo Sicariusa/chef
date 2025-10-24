@@ -1,7 +1,7 @@
 import { selectedTeamSlugStore, waitForSelectedTeamSlug } from '~/lib/stores/convexTeams';
 
 import { useConvex } from 'convex/react';
-import { getConvexAuthToken, waitForConvexSessionId } from '~/lib/stores/sessionId';
+import { getConvexOAuthToken, waitForConvexSessionId } from '~/lib/stores/sessionId';
 import { useCallback } from 'react';
 import { api } from '@convex/_generated/api';
 import { useChefAuth } from '~/components/chat/ChefAuthWrapper';
@@ -30,10 +30,10 @@ export function useHomepageInitializeChat(chatId: string, setChatInitialized: (c
       return false;
     }
 
-    const convexAccessToken = getConvexAuthToken(convex);
+    const convexAccessToken = getConvexOAuthToken();
     if (!convexAccessToken) {
-      console.error('No Convex access token');
-      toast.error('Unexpected error creating chat');
+      console.error('No Convex OAuth token - user needs to connect their Convex account');
+      toast.error('Please connect your Convex account first');
       return false;
     }
     const teamSlug = await waitForSelectedTeamSlug('useInitializeChat');
@@ -82,10 +82,10 @@ export function useExistingInitializeChat(chatId: string) {
   return useCallback(async () => {
     const sessionId = await waitForConvexSessionId('useInitializeChat');
     const teamSlug = await waitForSelectedTeamSlug('useInitializeChat');
-    const convexAccessToken = getConvexAuthToken(convex);
+    const convexAccessToken = getConvexOAuthToken();
     if (!convexAccessToken) {
-      console.error('No Convex access token');
-      toast.error('Unexpected error creating chat');
+      console.error('No Convex OAuth token - user needs to connect their Convex account');
+      toast.error('Please connect your Convex account first');
       return false;
     }
     const projectInitParams = {

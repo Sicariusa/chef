@@ -1,7 +1,6 @@
 import { map, computed, onMount } from 'nanostores';
 import { useStore } from '@nanostores/react';
-import { useConvex } from 'convex/react';
-import { convexAuthTokenStore, getConvexAuthToken } from '~/lib/stores/sessionId';
+import { getConvexOAuthToken } from '~/lib/stores/sessionId';
 import { VITE_PROVISION_HOST } from '~/lib/convexProvisionHost';
 import { debugOverrideStore, debugOverrideEnabledStore } from './debug';
 import { queryClientStore } from './reactQueryClient';
@@ -9,10 +8,6 @@ import { QueryObserver } from '@tanstack/react-query';
 import { useCallback, useEffect } from 'react';
 
 export function useTokenUsage(teamSlug: string | null): TeamUsageState {
-  // getConvexAuthToken has a side effect may need
-  const convex = useConvex();
-  void getConvexAuthToken(convex);
-
   const usageByTeam = useStore(usageStore);
 
   useEffect(() => {
@@ -94,7 +89,13 @@ onMount(serverTeamUsageStore, () => {
     }
     const observer = new QueryObserver<UsageData>(queryClientStore.get(), {
       queryKey: ['teamUsage', teamSlug],
-      queryFn: async () => await getTokenUsage(VITE_PROVISION_HOST, convexAuthTokenStore.get()!, teamSlug),
+      queryFn: async () => {
+        const token = getConvexOAuthToken();
+        if (!token) {
+          throw new Error('No Convex OAuth token - cannot fetch usage');
+        }
+        return await getTokenUsage(VITE_PROVISION_HOST, token, teamSlug);
+      },
       // TODO instead of fetching so much, refetch when know some tokens were just used
       refetchInterval: 10 * 60 * 1000,
     });
