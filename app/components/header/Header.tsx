@@ -21,7 +21,7 @@ import { useSelectedTeamSlug } from '~/lib/stores/convexTeams';
 import { useUsage } from '~/lib/stores/usage';
 import { useReferralStats } from '~/lib/hooks/useReferralCode';
 import { Menu } from '~/components/sidebar/Menu.client';
-import { useAuth } from '@workos-inc/authkit-react';
+import { useAuthActions } from '@convex-dev/auth/react';
 
 export function Header({ hideSidebarIcon = false }: { hideSidebarIcon?: boolean }) {
   const chat = useStore(chatStore);
@@ -32,7 +32,7 @@ export function Header({ hideSidebarIcon = false }: { hideSidebarIcon?: boolean 
   const showSidebarIcon = !hideSidebarIcon && isLoggedIn;
 
   const profile = useStore(profileStore);
-  const { signOut } = useAuth();
+  const { signOut } = useAuthActions();
 
   const teamSlug = useSelectedTeamSlug();
   const { isPaidPlan } = useUsage({ teamSlug });
@@ -41,7 +41,8 @@ export function Header({ hideSidebarIcon = false }: { hideSidebarIcon?: boolean 
   const handleLogout = () => {
     setProfile(null);
     window.localStorage.removeItem(SESSION_ID_KEY);
-    signOut({ returnTo: window.location.origin });
+    void signOut();
+    window.location.href = '/';
   };
 
   const handleSettingsClick = () => {

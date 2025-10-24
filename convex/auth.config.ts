@@ -1,13 +1,5 @@
-const clientId = process.env.WORKOS_CLIENT_ID;
-
+// This file is used by Convex to validate JWTs from the auth system
+// The actual auth configuration is in auth.ts
 export default {
-  providers: [
-    {
-      type: "customJwt",
-      issuer: `https://apiauth.convex.dev/user_management/${clientId}`,
-      algorithm: "RS256",
-      jwks: `https://apiauth.convex.dev/sso/jwks/${clientId}`,
-      applicationID: clientId,
-    },
-  ],
+  providers: [],
 };

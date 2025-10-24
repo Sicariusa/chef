@@ -22,9 +22,9 @@ export function ConvexConnectButton() {
       console.error('No team selected');
       return;
     }
-    const workosAccessToken = getConvexAuthToken(convexClient);
-    if (!workosAccessToken) {
-      console.error('No WorkOS access token');
+    const convexAccessToken = getConvexAuthToken(convexClient);
+    if (!convexAccessToken) {
+      console.error('No Convex access token');
       return;
     }
     await convexClient.mutation(api.convexProjects.startProvisionConvexProject, {
@@ -32,7 +32,7 @@ export function ConvexConnectButton() {
       chatId,
       projectInitParams: {
         teamSlug: selectedTeamSlug,
-        workosAccessToken,
+        workosAccessToken: convexAccessToken,
       },
     });
   };

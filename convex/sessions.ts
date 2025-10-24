@@ -136,7 +136,7 @@ async function getOrCreateCurrentMember(ctx: MutationCtx) {
     // Migrate cached profile, api key, etc
     // Migrate chats for all other members to existing member
     for (const extraMember of existingMembers.slice(1)) {
-      console.log("Migrating member ", extraMember._id, "to WorkOS");
+      console.log("Migrating member ", extraMember._id, "to new auth system");
       if (newApiKey === undefined && extraMember.apiKey !== undefined) {
         newApiKey = extraMember.apiKey;
       }
@@ -206,6 +206,21 @@ export const convexMemberId = query({
   },
 });
 
+export const getUserProfile = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return null;
+    }
+    return {
+      id: identity.subject ?? identity.convex_member_id ?? "",
+      name: identity.name ?? identity.givenName ?? identity.email?.split("@")[0] ?? "",
+      email: identity.email ?? "",
+      image: identity.pictureUrl ?? identity.picture ?? "",
+    };
+  },
+});
+
 export async function getCurrentMember(ctx: QueryCtx) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
@@ -248,8 +263,8 @@ export const updateCachedProfile = action({
     convexAuthToken: v.string(),
   },
   handler: async (ctx, { convexAuthToken }) => {
-    const workosProfile = await ctx.auth.getUserIdentity();
-    if (!workosProfile) {
+    const userIdentity = await ctx.auth.getUserIdentity();
+    if (!userIdentity) {
       throw new ConvexError({ code: "NotAuthorized", message: "Unauthorized" });
     }
 
@@ -269,10 +284,17 @@ export const updateCachedProfile = action({
     const convexProfile: ConvexProfile = await response.json();
 
     const profile = {
-      username: convexProfile.name || workosProfile.name || workosProfile.nickname || "",
-      email: convexProfile.email || workosProfile.email || "",
-      avatar: workosProfile.pictureUrl || "",
-      id: convexProfile.id || workosProfile.subject || "",
+      username:
+        convexProfile.name ||
+        (typeof userIdentity.name === "string" ? userIdentity.name : "") ||
+        (typeof userIdentity.givenName === "string" ? userIdentity.givenName : "") ||
+        "",
+      email: convexProfile.email || (typeof userIdentity.email === "string" ? userIdentity.email : "") || "",
+      avatar:
+        (typeof userIdentity.pictureUrl === "string" ? userIdentity.pictureUrl : "") ||
+        (typeof userIdentity.picture === "string" ? userIdentity.picture : "") ||
+        "",
+      id: convexProfile.id || (typeof userIdentity.subject === "string" ? userIdentity.subject : "") || "",
     };
 
     await ctx.runMutation(internal.sessions.saveCachedProfile, { profile });

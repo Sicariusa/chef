@@ -6,8 +6,10 @@ import { ConvexError } from "convex/values";
 import { openaiProxy } from "./openaiProxy";
 import { corsRouter } from "convex-helpers/server/cors";
 import { resendProxy } from "./resendProxy";
+import { auth } from "./auth";
 
 const http = httpRouter();
+auth.addHttpRoutes(http);
 const httpWithCors = corsRouter(http, {
   allowedHeaders: ["Content-Type", "X-Chef-Admin-Token"],
 });
@@ -180,7 +182,7 @@ http.route({
   method: "POST",
   handler: httpActionWithErrorHandling(async (ctx, request) => {
     const body = await request.json();
-    // We auth either via the WorkOS token or with a custom header
+    // We auth either via the auth token or with a custom header
     const header = request.headers.get("X-Chef-Admin-Token");
     const authHeader = request.headers.get("Authorization");
     if (authHeader === null) {

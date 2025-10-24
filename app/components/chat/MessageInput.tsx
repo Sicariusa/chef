@@ -36,7 +36,7 @@ import { captureException } from '@sentry/remix';
 import { Menu as MenuComponent, MenuItem as MenuItemComponent } from '@ui/Menu';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { ChatBubbleLeftIcon, DocumentArrowUpIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
-import { useAuth } from '@workos-inc/authkit-react';
+import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvex } from 'convex/react';
 
 const PROMPT_LENGTH_WARNING_THRESHOLD = 2000;
@@ -605,13 +605,13 @@ const CharacterWarning = memo(function CharacterWarning() {
 });
 
 const SignInButton = memo(function SignInButton() {
-  const { signIn } = useAuth();
+  const { signIn } = useAuthActions();
 
   return (
     <Button
       variant="neutral"
       onClick={() => {
-        void signIn();
+        void signIn('google');
       }}
       size="xs"
       className="text-xs font-normal"

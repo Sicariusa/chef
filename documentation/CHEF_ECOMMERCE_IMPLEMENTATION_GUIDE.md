@@ -7,6 +7,7 @@ This document explains the complete implementation of the Chef E-Commerce Genera
 ## What is Chef?
 
 Chef is an AI-powered development environment that generates full-stack web applications. It uses:
+
 - **Convex** as the backend (database, real-time, auth, functions)
 - **React + Vite** for the frontend
 - **TailwindCSS** for styling
@@ -19,6 +20,7 @@ Originally, Chef could generate any type of application (chat apps, todo lists, 
 ## The Solution
 
 The implementation works by modifying Chef's core configuration to:
+
 1. **Replace the default template** with a complete e-commerce template
 2. **Force the AI agent** to always generate e-commerce apps through system prompts
 3. **Pre-warm the AI** with e-commerce-specific files
@@ -68,6 +70,7 @@ template/
 **Key Files Created**:
 
 **Backend (Convex Functions)**:
+
 - `convex/schema.ts` - Database schema with products, cart, orders, roles tables
 - `convex/products.ts` - Product CRUD operations (create, read, update, delete)
 - `convex/cart.ts` - Shopping cart operations (add, remove, update quantities)
@@ -77,6 +80,7 @@ template/
 - `convex/auth.config.ts` - Auth config file
 
 **Frontend (React Components)**:
+
 - `src/App.tsx` - Main app with routing logic
 - `src/pages/HomePage.tsx` - Product listing page
 - `src/pages/CartPage.tsx` - Shopping cart page
@@ -88,6 +92,7 @@ template/
 - `src/SignOutButton.tsx` - Logout button
 
 **Configuration**:
+
 - `package.json` - Dependencies and scripts
 - `vite.config.ts` - Vite configuration
 - `tailwind.config.js` - TailwindCSS configuration
@@ -98,6 +103,7 @@ template/
 **Purpose**: Make the e-commerce template the default starting point
 
 **What Happened**:
+
 - Copied all e-commerce files from `template/ecommerce/` to `template/`
 - Updated `package.json` to reflect e-commerce nature
 - Changed app title from "Chef" to "Chef Store - E-Commerce"
@@ -111,6 +117,7 @@ template/
 ### What is the Agent Configuration?
 
 The Chef AI agent has configuration files that control:
+
 - What suggestions to show users
 - How the AI behaves (system prompts)
 - What files the AI sees first (pre-warm paths)
@@ -120,6 +127,7 @@ The Chef AI agent has configuration files that control:
 #### 1. Updated Constants (`chef-agent/constants.ts`)
 
 **Before**:
+
 ```typescript
 export const SUGGESTIONS = [
   { title: 'Chat App', prompt: 'Build a chat application...' },
@@ -129,26 +137,28 @@ export const SUGGESTIONS = [
 ```
 
 **After**:
+
 ```typescript
 export const SUGGESTIONS = [
   {
     title: 'E-Commerce Store',
-    prompt: `Build a fully-featured online store with product listing, shopping cart, checkout, order management, and admin dashboard...`
-  }
+    prompt: `Build a fully-featured online store with product listing, shopping cart, checkout, order management, and admin dashboard...`,
+  },
 ];
 ```
 
 **Impact**: Users now only see "E-Commerce Store" as a suggestion
 
 **Pre-warm Paths Updated**:
+
 ```typescript
 export const PREWARM_PATHS = [
   `${WORK_DIR}/package.json`,
   `${WORK_DIR}/convex/schema.ts`,
-  `${WORK_DIR}/convex/products.ts`,    // ← New
-  `${WORK_DIR}/convex/cart.ts`,        // ← New
-  `${WORK_DIR}/convex/orders.ts`,      // ← New
-  `${WORK_DIR}/convex/roles.ts`,       // ← New
+  `${WORK_DIR}/convex/products.ts`, // ← New
+  `${WORK_DIR}/convex/cart.ts`, // ← New
+  `${WORK_DIR}/convex/orders.ts`, // ← New
+  `${WORK_DIR}/convex/roles.ts`, // ← New
   `${WORK_DIR}/src/App.tsx`,
   `${WORK_DIR}/src/pages/HomePage.tsx`, // ← New
   `${WORK_DIR}/src/components/ProductCard.tsx`, // ← New
@@ -161,6 +171,7 @@ export const PREWARM_PATHS = [
 #### 2. Updated System Prompts (`chef-agent/prompts/solutionConstraints.ts`)
 
 **Added E-Commerce Only Section**:
+
 ```typescript
 <ecommerce_only>
   # E-COMMERCE ONLY
@@ -171,12 +182,12 @@ export const PREWARM_PATHS = [
   - Orders table with checkout and order history
   - Roles table for role-based access control (user and admin roles)
   - Admin dashboard for product management and order viewing
-  
+
   Use the e-commerce template structure with:
   - Convex backend functions: products.ts, cart.ts, orders.ts, roles.ts
   - Frontend pages: HomePage (product listing), CartPage, OrdersPage, AdminDashboard
   - Frontend components: Navbar, ProductCard
-  
+
   Do not modify locked Chef files. Add new files as needed following the e-commerce template pattern.
 </ecommerce_only>
 ```
@@ -242,12 +253,14 @@ roles: {
 ### Role-Based Access Control
 
 **User Role (default)**:
+
 - Browse products
 - Add items to cart
 - Place orders
 - View own orders
 
 **Admin Role**:
+
 - All user permissions
 - Create, update, delete products
 - View all orders
@@ -256,6 +269,7 @@ roles: {
 ### Frontend Architecture
 
 **Main App Structure**:
+
 ```typescript
 App.tsx
 ├── Authenticated
@@ -276,6 +290,7 @@ App.tsx
 ### Convex Backend Functions
 
 **Products Management**:
+
 - `listProducts()` - Get all products (public)
 - `getProduct(id)` - Get single product
 - `createProduct(data)` - Create product (admin only)
@@ -283,18 +298,21 @@ App.tsx
 - `deleteProduct(id)` - Delete product (admin only)
 
 **Shopping Cart**:
+
 - `getCart()` - Get user's cart items
 - `addToCart(productId, quantity)` - Add item to cart
 - `updateCartItem(id, quantity)` - Update cart item quantity
 - `removeFromCart(id)` - Remove item from cart
 
 **Orders**:
+
 - `listOrdersForUser()` - Get user's orders
 - `placeOrder(items, total)` - Create order from cart
 - `listAllOrders()` - Get all orders (admin only)
 - `updateOrderStatus(id, status)` - Update order status (admin only)
 
 **Roles**:
+
 - `getMyRole()` - Get current user's role
 - `assignRole(userId, role)` - Assign role (admin only)
 - `seedMyAdmin()` - Make current user admin
@@ -302,12 +320,14 @@ App.tsx
 ### React Frontend Components
 
 **Pages**:
+
 - `HomePage` - Product grid with search/filter capabilities
 - `CartPage` - Cart items with quantity controls and checkout
 - `OrdersPage` - Order history with status tracking
 - `AdminDashboard` - Product management and order administration
 
 **Components**:
+
 - `Navbar` - Navigation with cart counter and role-based admin link
 - `ProductCard` - Product display with add-to-cart functionality
 
@@ -323,11 +343,13 @@ App.tsx
 ## Part 5: Why So Many Files Changed
 
 ### First Commit (51 files)
+
 - Created complete e-commerce template (`template/ecommerce/`)
 - Replaced main template files (`template/`)
 - Updated agent configuration (`chef-agent/constants.ts`, `chef-agent/prompts/solutionConstraints.ts`)
 
 ### Second Commit (28 files)
+
 - Code formatting fixes (Prettier/ESLint)
 - Minor bug fixes and improvements
 - Documentation updates
@@ -335,19 +357,23 @@ App.tsx
 ### File Categories
 
 **Template Files** (34 files):
+
 - Backend: `convex/*.ts` files
 - Frontend: `src/**/*.tsx` files
 - Config: `package.json`, `vite.config.ts`, etc.
 
 **Agent Configuration** (2 files):
+
 - `chef-agent/constants.ts`
 - `chef-agent/prompts/solutionConstraints.ts`
 
 **Documentation** (2 files):
+
 - `ECOMMERCE_IMPLEMENTATION_SUMMARY.md`
 - `template/ecommerce/README.md`
 
 **Code Quality** (41 files):
+
 - Formatting fixes across the codebase
 - Linter error corrections
 
@@ -367,16 +393,19 @@ App.tsx
 ### For Developers
 
 **To modify the e-commerce template**:
+
 1. Edit files in `template/ecommerce/`
 2. Copy changes to `template/` (main template)
 3. Update agent configuration if needed
 
 **To add new features**:
+
 1. Add Convex functions in `template/convex/`
 2. Add React components in `template/src/`
 3. Update system prompts if behavior changes needed
 
 **To change the app type**:
+
 1. Replace template files with new app type
 2. Update `SUGGESTIONS` in `constants.ts`
 3. Update system prompts in `solutionConstraints.ts`
@@ -387,12 +416,14 @@ App.tsx
 ## Part 7: Key Benefits
 
 ### For Users
+
 - **Consistent Results**: Always get e-commerce apps, no confusion
 - **Complete Template**: Full-featured app with admin dashboard
 - **Role-Based Access**: User and admin roles built-in
 - **Real-time Updates**: Convex provides live data updates
 
 ### For Developers
+
 - **Predictable Behavior**: AI always generates e-commerce apps
 - **Template System**: Easy to modify and extend
 - **Configuration Control**: Clear separation of concerns
@@ -405,15 +436,19 @@ App.tsx
 ### Common Issues
 
 **"Access Denied" on Admin Dashboard**:
+
 - Solution: Run `seedMyAdmin()` in browser console
 
 **Products not showing**:
+
 - Solution: Create products using admin dashboard
 
 **Cart not updating**:
+
 - Solution: Check Convex deployment and authentication
 
 **Build errors**:
+
 - Solution: Run `npm install` and check TypeScript errors
 
 ### Debugging Steps
