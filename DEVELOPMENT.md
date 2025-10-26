@@ -97,18 +97,9 @@ can use the Vercel instant rollbacks to prompt old deployments to production.
   Note that this is _not_ the OAuth flow that we offer to customers; if a customer wants this,
   they need to use the OAuth flow that grants them access to a user's specific Convex project.
 - You'll need the following env vars set in `.env.local` (values are in 1Password under `flex .env.local`)
-
-**Platform Authentication (WorkOS/Convex for Chef platform itself):**
   - VITE_WORKOS_CLIENT_ID=client_01K0YV0SNPRYJ5AV4AS0VG7T1J
   - VITE_WORKOS_REDIRECT_URI=http://127.0.0.1:5173
   - VITE_WORKOS_API_HOSTNAME=apiauth.convex.dev
-  - WORKOS_CLIENT_ID=client_01K0YV0SNPRYJ5AV4AS0VG7T1J (for convex/auth.config.ts)
-
-**OAuth App Credentials (for users connecting their Convex projects):**
-  - CONVEX_OAUTH_CLIENT_ID=<public_oauth_app_client_id>
-  - CONVEX_OAUTH_CLIENT_SECRET=<public_oauth_app_secret>
-
-**Note:** The OAuth credentials must be from a **public OAuth application** registered with Convex, not developer-specific credentials. This allows any user to authorize Chef to access their Convex projects for their e-commerce stores.
 
 (it'll also be in the default Convex project env vars, so you can sync via dashboard).
 
