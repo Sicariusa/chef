@@ -252,3 +252,53 @@ export const validateXaiApiKey = action({
     return true;
   },
 });
+
+export const validateOpenrouterApiKey = action({
+  args: {
+    apiKey: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({ code: "NotAuthorized", message: "Unauthorized" });
+    }
+
+    const response = await fetch("https://openrouter.ai/api/v1/models", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${args.apiKey}`,
+      },
+    });
+
+    if (response.status === 401) {
+      return false;
+    }
+    return true;
+  },
+});
+
+export const deleteOpenrouterApiKeyForCurrentMember = mutation({
+  args: {},
+  returns: v.null(),
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({ code: "NotAuthorized", message: "Unauthorized" });
+    }
+
+    const existingMember = await getMemberByConvexMemberIdQuery(ctx, identity).first();
+
+    if (!existingMember) {
+      throw new ConvexError({ code: "NotAuthorized", message: "Unauthorized" });
+    }
+    if (!existingMember.apiKey) {
+      return;
+    }
+    await ctx.db.patch(existingMember._id, {
+      apiKey: {
+        ...existingMember.apiKey,
+        openrouter: undefined,
+      },
+    });
+  },
+});

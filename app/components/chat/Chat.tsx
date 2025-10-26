@@ -376,8 +376,12 @@ export const Chat = memo(
         }
         let shouldDisableTools = false;
 
-        // Disable tools for ALL OpenRouter free models (most don't support tool use)
-        // If you want full tool support, use Google Gemini API directly instead
+        // CRITICAL: Disable tools for ALL OpenRouter models
+        // Reason: OpenRouter models have incompatible streaming implementation
+        // When tools are enabled + streaming mode, we get: "Tools are not supported in streaming mode"
+        // This is a limitation of the ModelRun provider on OpenRouter
+        // Workaround: Users should use artifacts/boltAction instead of tool calls
+        // Alternative: Use models directly from their native providers (Anthropic, Google, OpenAI)
         if (modelProvider === 'OpenRouter') {
           shouldDisableTools = true;
         }

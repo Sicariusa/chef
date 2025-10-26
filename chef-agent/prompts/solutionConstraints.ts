@@ -7,21 +7,100 @@ export function solutionConstraints(options: SystemPromptOptions) {
   <solution_constraints>
 
     <ecommerce_only>
-      # E-COMMERCE ONLY
-      Always generate an e-commerce application. Do NOT generate other app types.
-      The application MUST include:
-      - Products table with listing, viewing, creating, updating, and deleting functionality
-      - Shopping cart functionality (add, remove, update quantities)
-      - Orders table with checkout and order history
-      - Roles table for role-based access control (user and admin roles)
-      - Admin dashboard for product management and order viewing
+      ═══════════════════════════════════════════════════════════════
+      # E-COMMERCE TEMPLATE STRUCTURE
+      ═══════════════════════════════════════════════════════════════
       
-      Use the e-commerce template structure with:
-      - Convex backend functions: products.ts, cart.ts, orders.ts, roles.ts
-      - Frontend pages: HomePage (product listing), CartPage, OrdersPage, AdminDashboard
-      - Frontend components: Navbar, ProductCard
+      ⚠️ CRITICAL: READ TEMPLATE FILES FROM template/ecommerce/ (NOT template/)
       
-      Do not modify locked Chef files. Add new files as needed following the e-commerce template pattern.
+      TEMPLATE SOURCE: template/ecommerce/
+      - Backend files: template/ecommerce/convex/
+      - Frontend files: template/ecommerce/src/
+      
+      The project starts with a COMPLETE e-commerce template at /home/project.
+      
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      📁 EXISTING TEMPLATE STRUCTURE (DO NOT RECREATE)
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      
+      Backend (/home/project/convex/):
+        SOURCE: template/ecommerce/convex/
+        ✓ schema.ts         - Database schema (products, cart, orders, roles)
+        ✓ products.ts       - Product management functions
+        ✓ cart.ts           - Shopping cart functions
+        ✓ orders.ts         - Order processing functions
+        ✓ roles.ts          - User role management (getMyRole, setMyRole)
+        🔒 auth.ts          - LOCKED: DO NOT MODIFY
+        🔒 http.ts          - LOCKED: DO NOT MODIFY
+      
+      Frontend (/home/project/src/):
+        SOURCE: template/ecommerce/src/
+        ✓ pages/HomePage.tsx          - Product listing
+        ✓ pages/CartPage.tsx          - Shopping cart
+        ✓ pages/OrdersPage.tsx        - Order history
+        ✓ pages/AdminDashboard.tsx    - Admin panel
+        ✓ components/Navbar.tsx       - Navigation bar
+        ✓ components/ProductCard.tsx  - Product display
+        ✓ contexts/LanguageContext.tsx - Language switching
+        ✓ i18n/locales/en.ts          - English translations
+        ✓ i18n/locales/ar.ts          - Arabic translations
+        ✓ App.tsx                     - Main application
+        ✓ index.css                   - Global styles
+        🔒 main.tsx                   - LOCKED: DO NOT MODIFY
+        🔒 SignInForm.tsx             - WITH ROLE DROPDOWN - LOCKED: DO NOT MODIFY
+        🔒 SignOutButton.tsx          - LOCKED: DO NOT MODIFY
+      
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      📋 USAGE GUIDELINES
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      
+      When user selects basic "E-Commerce Store":
+        → COPY the template files directly to /home/project
+        → Use the structure as-is
+      
+      When user customizes (NovaWear, TerraMarket, Luxora, etc.):
+        → ENHANCE existing template files (don't recreate)
+        → Modify content, not structure
+        → Keep all existing functionality
+      
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      ✅ TEMPLATE FEATURES (ALREADY INCLUDED)
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      
+      ✓ Complete product catalog system
+      ✓ Shopping cart with add/update/remove
+      ✓ Order processing and history
+      ✓ Role-based access control (user/admin)
+      ✓ User authentication with role selection
+      ✓ Modern glassmorphism UI design
+      ✓ Smooth animations and transitions
+      ✓ Responsive mobile-first layout
+      ✓ Arabic language support with RTL
+      ✓ English ⇄ Arabic language toggle
+      ✓ Toast notifications (sonner)
+      ✓ Loading states
+      ✓ Error handling
+      
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      🚫 CRITICAL RULES
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      
+      ⚠️ READ FROM: template/ecommerce/ (NOT template/)
+      
+      ❌ DO NOT read from template/src/ (old version, missing role selection)
+      ❌ DO NOT read from template/convex/ (old version)
+      ❌ DO NOT recreate files that already exist
+      ❌ DO NOT modify locked files (marked with 🔒)
+      ❌ DO NOT use HTML entities (use &&, <, > instead of &amp;&amp;, &lt;, &gt;)
+      ❌ DO NOT create convex/users.ts (use convex/roles.ts)
+      ❌ DO NOT use api.users.* (use api.roles.*, api.products.*, etc.)
+      
+      ✅ DO read all files from template/ecommerce/ directory
+      ✅ DO use template/ecommerce/src/SignInForm.tsx (has role dropdown)
+      ✅ DO modify existing template files to match user requirements
+      ✅ DO maintain the existing file structure
+      ✅ DO keep all existing functionality
+      ✅ DO use proper Convex syntax (see guidelines below)
     </ecommerce_only>
 
     ${options.includeTemplate ? templateInfo() : ''}
@@ -105,24 +184,52 @@ export function solutionConstraints(options: SystemPromptOptions) {
       </auth_server_guidelines>
 
       <client_guidelines>
-        Here is an example of using Convex from a React app:
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        🎯 REACT + CONVEX CLIENT PATTERNS
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        
+        ⚠️ CRITICAL: NEVER USE HTML ENTITIES IN JSX/TSX CODE
+        
+        ❌ WRONG (HTML entities - breaks React):
+        \`\`\`tsx
+        {user &amp;&amp; <div>Welcome</div>}
+        {count &lt; 10 &amp;&amp; <span>Low</span>}
+        {price &gt; 100 ? "Expensive" : "Cheap"}
+        \`\`\`
+        
+        ✅ CORRECT (Real operators):
+        \`\`\`tsx
+        {user && <div>Welcome</div>}
+        {count < 10 && <span>Low</span>}
+        {price > 100 ? "Expensive" : "Cheap"}
+        \`\`\`
+        
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        📚 CONVEX REACT HOOKS USAGE
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        
+        Basic Example:
         \`\`\`tsx
         import React, { useState } from "react";
         import { useMutation, useQuery } from "convex/react";
         import { api } from "../convex/_generated/api";
 
         export default function App() {
+          // ✅ CORRECT: useQuery for reading data (live-updating!)
           const messages = useQuery(api.messages.list) || [];
-
-          const [newMessageText, setNewMessageText] = useState("");
+          
+          // ✅ CORRECT: useMutation for writing data
           const sendMessage = useMutation(api.messages.send);
 
+          const [newMessageText, setNewMessageText] = useState("");
           const [name] = useState(() => "User " + Math.floor(Math.random() * 10000));
+          
           async function handleSendMessage(event) {
             event.preventDefault();
             await sendMessage({ body: newMessageText, author: name });
             setNewMessageText("");
           }
+          
           return (
             <main>
               <h1>Convex Chat</h1>
@@ -153,17 +260,18 @@ export function solutionConstraints(options: SystemPromptOptions) {
         }
         \`\`\`
 
-        The \`useQuery()\` hook is live-updating! It causes the React component is it used in to rerender, so Convex is a
-        perfect fix for collaborative, live-updating websites.
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        🚫 CONDITIONAL HOOKS (NEVER DO THIS)
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        NEVER use \`useQuery()\` or other \`use\` hooks conditionally. The following example is invalid:
-
+        ❌ WRONG (Conditional hook call):
         \`\`\`tsx
-        const avatarUrl = profile?.avatarId ? useQuery(api.profiles.getAvatarUrl, { storageId: profile.avatarId }) : null;
+        const avatarUrl = profile?.avatarId 
+          ? useQuery(api.profiles.getAvatarUrl, { storageId: profile.avatarId }) 
+          : null;
         \`\`\`
 
-        You should do this instead:
-
+        ✅ CORRECT (Use "skip" parameter):
         \`\`\`tsx
         const avatarUrl = useQuery(
           api.profiles.getAvatarUrl,
@@ -171,23 +279,103 @@ export function solutionConstraints(options: SystemPromptOptions) {
         );
         \`\`\`
 
-        If you want to use a UI element, you MUST create it. DO NOT use external libraries like Shadcn/UI.
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        📝 IMPORTANT RULES
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        When writing a UI component and you want to use a Convex function, you MUST import the \`api\` object. For example:
-
-        \`\`\`tsx
-        import { api } from "../convex/_generated/api";
-        \`\`\`
-
-        You can use the \`api\` object to call any public Convex function.
-
-        Do not use \`sharp\` for image compression, always use \`canvas\` for image compression.
-
-        Always make sure your UIs work well with anonymous users.
-
-        Always make sure the functions you are calling are defined in the \`convex/\` directory and use the \`api\` or \`internal\` object to call them.
+        ✅ The useQuery() hook is LIVE-UPDATING automatically
+        ✅ Always import api from "../convex/_generated/api"
+        ✅ Check that functions exist in convex/ directory before calling
+        ✅ Verify correct arguments (non-optional args can't be null)
+        ✅ Create custom UI components (don't use Shadcn/UI)
+        ✅ Use canvas for image compression (not sharp)
+        ✅ Support anonymous users in UI
+        ✅ Handle loading states (useQuery can return undefined initially)
+        ✅ Use proper TypeScript types from convex/_generated/dataModel
         
-        Always make sure you are using the correct arguments for convex functions. If arguments are not optional, make sure they are not null.
+        ❌ NEVER use HTML entities (&amp;&amp;, &lt;, &gt;)
+        ❌ NEVER use hooks conditionally
+        ❌ NEVER call functions that don't exist
+        ❌ NEVER pass null for required arguments
+        ❌ NEVER use external UI libraries
+        
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        💡 E-COMMERCE SPECIFIC EXAMPLES
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        
+        Loading Products:
+        \`\`\`tsx
+        import { useQuery } from "convex/react";
+        import { api } from "../convex/_generated/api";
+        
+        function ProductList() {
+          const products = useQuery(api.products.list);
+          
+          if (!products) {
+            return <div>Loading products...</div>;
+          }
+          
+          return (
+            <div className="grid grid-cols-3 gap-4">
+              {products.length > 0 && products.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+          );
+        }
+        \`\`\`
+        
+        Adding to Cart:
+        \`\`\`tsx
+        import { useMutation } from "convex/react";
+        import { api } from "../convex/_generated/api";
+        import type { Id } from "../convex/_generated/dataModel";
+        
+        function AddToCartButton({ productId }: { productId: Id<"products"> }) {
+          const addToCart = useMutation(api.cart.add);
+          const [loading, setLoading] = useState(false);
+          
+          async function handleClick() {
+            setLoading(true);
+            try {
+              await addToCart({ productId, quantity: 1 });
+              toast.success("Added to cart!");
+            } catch (error) {
+              toast.error("Failed to add to cart");
+            } finally {
+              setLoading(false);
+            }
+          }
+          
+          return (
+            <button onClick={handleClick} disabled={loading}>
+              {loading ? "Adding..." : "Add to Cart"}
+            </button>
+          );
+        }
+        \`\`\`
+        
+        Checking User Role:
+        \`\`\`tsx
+        import { useQuery } from "convex/react";
+        import { api } from "../convex/_generated/api";
+        
+        function AdminPanel() {
+          const role = useQuery(api.roles.getMyRole);
+          
+          // Handle loading state
+          if (role === undefined) {
+            return <div>Loading...</div>;
+          }
+          
+          // Check admin access
+          if (role !== "admin") {
+            return <div>Access denied. Admin only.</div>;
+          }
+          
+          return <div>Admin Dashboard Content</div>;
+        }
+        \`\`\`
       </client_guidelines>
     </convex_guidelines>
   </solution_constraints>
@@ -197,14 +385,22 @@ export function solutionConstraints(options: SystemPromptOptions) {
 function templateInfo() {
   return stripIndents`
   <template_info>
-    The Chef WebContainer environment starts with a full-stack app template fully loaded at '/home/project',
+    ⚠️ CRITICAL: READ TEMPLATE FILES FROM template/ecommerce/ (NOT template/)
+    
+    The Chef WebContainer environment starts with a complete e-commerce template fully loaded at '/home/project',
     the current working directory. Its dependencies are specified in the 'package.json' file and already
-    installed in the 'node_modules' directory. You MUST use this template. This template uses the following
-    technologies:
-    - Vite + React for the frontend
-    - TailwindCSS for styling
-    - Convex for the database, functions, scheduling, HTTP handlers, and search.
-    - Convex Auth for authentication.
+    installed in the 'node_modules' directory. You MUST use this e-commerce template. This template includes:
+    - Complete e-commerce backend with products, cart, orders, and roles tables
+    - Full Convex authentication setup with signup/signin WITH ROLE SELECTION
+    - Frontend pages: HomePage, CartPage, OrdersPage, AdminDashboard
+    - Modern glassmorphism UI with smooth animations
+    - Arabic language support with RTL layout
+    - Technologies: Vite + React, TailwindCSS, Convex, Convex Auth
+    
+    TEMPLATE SOURCE LOCATION:
+    - Backend: template/ecommerce/convex/
+    - Frontend: template/ecommerce/src/
+    - DO NOT USE: template/src/ or template/convex/ (old versions)
 
     Here are some important files within the template:
 
@@ -223,6 +419,9 @@ function templateInfo() {
       within Chef. They can download the code and do it themselves.
       IMPORTANT: Do NOT modify the \`convex/auth.ts\`, \`src/SignInForm.tsx\`, or \`src/SignOutButton.tsx\` files under any circumstances. These files are locked, and
       your changes will not be persisted if you try to modify them.
+      
+      ⚠️ USE: template/ecommerce/src/SignInForm.tsx (has role selection dropdown)
+      ❌ DON'T USE: template/src/SignInForm.tsx (missing role selection)
     </file>
 
     <file path="convex/http.ts">

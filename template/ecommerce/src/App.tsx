@@ -1,5 +1,5 @@
-import { Authenticated, Unauthenticated, useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
+import { Authenticated, Unauthenticated, useQuery, useMutation } from "convex/react";
+import { api } from "../ecommerce/convex/_generated/api";
 import { SignInForm } from "./SignInForm";
 import { Navbar } from "./components/Navbar";
 import { HomePage } from "./pages/HomePage";
@@ -7,16 +7,29 @@ import { CartPage } from "./pages/CartPage";
 import { OrdersPage } from "./pages/OrdersPage";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { Toaster } from "sonner";
-import { useState } from "react";
-import type { Id } from "../convex/_generated/dataModel";
+import { useState, useEffect } from "react";
+import type { Id } from "../ecommerce/convex/_generated/dataModel";
+import { LanguageProvider, useLanguage } from "./contexts/LanguageContext";
 
-export default function App() {
+function AppContent() {
   const [currentPage, setCurrentPage] = useState<string>("home");
   const [selectedProductId, setSelectedProductId] =
     useState<Id<"products"> | null>(null);
+  const setMyRole = useMutation(api.roles.setMyRole);
+
+  // Set role from localStorage after authentication
+  useEffect(() => {
+    const pendingRole = localStorage.getItem("pendingRole");
+    if (pendingRole) {
+      const role = pendingRole as "user" | "admin";
+      void setMyRole({ role }).then(() => {
+        localStorage.removeItem("pendingRole");
+      });
+    }
+  }, [setMyRole]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col">
       <Authenticated>
         <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
         <main className="flex-1">
@@ -54,5 +67,13 @@ export default function App() {
 
       <Toaster />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }

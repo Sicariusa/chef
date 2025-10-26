@@ -7,17 +7,27 @@ export function SignInForm() {
   const { signIn } = useAuthActions();
   const [flow, setFlow] = useState<"signIn" | "signUp">("signIn");
   const [submitting, setSubmitting] = useState(false);
+  const [role, setRole] = useState<"user" | "admin">("user");
 
   return (
     <div className="w-full">
       <form
         className="flex flex-col gap-form-field"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
           setSubmitting(true);
           const formData = new FormData(e.target as HTMLFormElement);
           formData.set("flow", flow);
-          void signIn("password", formData).catch((error) => {
+          if (flow === "signUp") {
+            formData.set("role", role);
+          }
+          try {
+            await signIn("password", formData);
+            // If signup was successful and role is set, we'll store it
+            if (flow === "signUp" && role) {
+              localStorage.setItem("pendingRole", role);
+            }
+          } catch (error: any) {
             let toastTitle = "";
             if (error.message.includes("Invalid password")) {
               toastTitle = "Invalid password. Please try again.";
@@ -29,7 +39,7 @@ export function SignInForm() {
             }
             toast.error(toastTitle);
             setSubmitting(false);
-          });
+          }
         }}
       >
         <input
@@ -46,6 +56,16 @@ export function SignInForm() {
           placeholder="Password"
           required
         />
+        {flow === "signUp" && (
+          <select
+            className="auth-input-field"
+            value={role}
+            onChange={(e) => setRole(e.target.value as "user" | "admin")}
+          >
+            <option value="user">Sign up as Customer</option>
+            <option value="admin">Sign up as Admin</option>
+          </select>
+        )}
         <button className="auth-button" type="submit" disabled={submitting}>
           {flow === "signIn" ? "Sign in" : "Sign up"}
         </button>

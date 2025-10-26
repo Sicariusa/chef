@@ -64,6 +64,7 @@
     "@convex-dev/rate-limiter": "^0.2.9",
     "@convex-dev/workos": "^0.0.1",
     "@fast-check/vitest": "^0.2.1",
+    "@google/generative-ai": "^0.24.1",
     "@heroicons/react": "^2.2.0",
     "@iconify-json/svg-spinners": "^1.2.1",
     "@nanostores/react": "^0.7.3",

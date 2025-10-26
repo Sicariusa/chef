@@ -59,3 +59,22 @@ export const seedMyAdmin = mutation({
     return await ctx.db.insert("roles", { userId, role: "admin" });
   },
 });
+
+/**
+ * Set role for the current user (called after signup)
+ */
+export const setMyRole = mutation({
+  args: { role: v.string() },
+  handler: async (ctx, { role }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const existing = await ctx.db
+      .query("roles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .unique();
+    if (existing) {
+      return await ctx.db.patch(existing._id, { role });
+    }
+    return await ctx.db.insert("roles", { userId, role });
+  },
+});
