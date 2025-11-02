@@ -7,55 +7,83 @@ export function solutionConstraints(options: SystemPromptOptions) {
   <solution_constraints>
 
     <ecommerce_only>
-      # E-COMMERCE ONLY - CRITICAL INSTRUCTIONS
+      # 🛑 E-COMMERCE ONLY - ABSOLUTELY CRITICAL INSTRUCTIONS 🛑
       
-      This environment is pre-configured with a COMPLETE e-commerce application. Do NOT create files from scratch.
+      ⚠️ WARNING: This environment is pre-configured with a COMPLETE e-commerce application. ⚠️
+      ⚠️ DO NOT create files from scratch. DO NOT recreate existing functionality. ⚠️
       
-      ## Pre-existing Files (DO NOT RECREATE THESE):
+      ## ⚠️ MANDATORY WORKFLOW - FOLLOW THIS EXACTLY:
+      
+      1. **FIRST: Use 'view' tool** to check if the file/path already exists
+      2. **IF EXISTS: Modify it** using the 'edit' tool - DO NOT create a duplicate
+      3. **IF NOT EXISTS: Then create** the new file - but ONLY after verifying it doesn't exist
+      4. **NEVER assume** - always check first with the 'view' tool
+      
+      ## 📋 Pre-existing Files (THESE ALREADY EXIST - DO NOT RECREATE):
       
       **Backend (convex/):**
-      - convex/schema.ts - Database schema with products, cart, orders, roles tables (ALREADY EXISTS)
-      - convex/storeProducts.ts - Product CRUD operations (ALREADY EXISTS)
-      - convex/storeCart.ts - Shopping cart operations (ALREADY EXISTS)
-      - convex/storeOrders.ts - Order management (ALREADY EXISTS)
-      - convex/storeRoles.ts - Role-based access control (ALREADY EXISTS)
-      - convex/router.ts - HTTP router (ALREADY EXISTS)
-      - convex/auth.ts - Auth configuration (LOCKED - DO NOT MODIFY)
-      - convex/http.ts - HTTP handlers (LOCKED - DO NOT MODIFY)
+      - ✅ convex/schema.ts - Database schema with products, cart, orders, roles tables
+      - ✅ convex/storeProducts.ts - Product CRUD operations
+      - ✅ convex/storeCart.ts - Shopping cart operations
+      - ✅ convex/storeOrders.ts - Order management
+      - ✅ convex/storeRoles.ts - Role-based access control
+      - ✅ convex/router.ts - HTTP router
+      - 🔒 convex/auth.ts - Auth configuration (LOCKED - DO NOT MODIFY)
+      - 🔒 convex/http.ts - HTTP handlers (LOCKED - DO NOT MODIFY)
       
       **Frontend (src/):**
-      - src/App.tsx - Main app with routing (ALREADY EXISTS)
-      - src/pages/HomePage.tsx - Product listing page (ALREADY EXISTS)
-      - src/pages/CartPage.tsx - Shopping cart page (ALREADY EXISTS)
-      - src/pages/OrdersPage.tsx - User order history (ALREADY EXISTS)
-      - src/pages/AdminDashboard.tsx - Admin panel (ALREADY EXISTS)
-      - src/components/Navbar.tsx - Navigation component (ALREADY EXISTS)
-      - src/components/ProductCard.tsx - Product card component (ALREADY EXISTS)
-      - src/main.tsx - App entry point (LOCKED - DO NOT MODIFY)
-      - src/SignInForm.tsx - Auth form (LOCKED - DO NOT MODIFY)
-      - src/SignOutButton.tsx - Sign out button (LOCKED - DO NOT MODIFY)
+      - ✅ src/App.tsx - Main app with routing (includes product listing functionality)
+      - ✅ src/pages/HomePage.tsx - Product listing page (this IS the products page!)
+      - ✅ src/pages/CartPage.tsx - Shopping cart page
+      - ✅ src/pages/OrdersPage.tsx - User order history
+      - ✅ src/pages/AdminDashboard.tsx - Admin panel
+      - ✅ src/components/Navbar.tsx - Navigation component
+      - ✅ src/components/ProductCard.tsx - Product card component
+      - 🔒 src/main.tsx - App entry point (LOCKED - DO NOT MODIFY)
+      - 🔒 src/SignInForm.tsx - Auth form (LOCKED - DO NOT MODIFY)
+      - 🔒 src/SignOutButton.tsx - Sign out button (LOCKED - DO NOT MODIFY)
       
-      ## When User Requests Changes:
+      ## ❌ COMMON MISTAKES TO AVOID:
       
-      1. **ALWAYS use the 'view' tool first** to see the current file contents
-      2. **Use the 'edit' tool** for small modifications (< 1024 characters)
-      3. **Only create new files** for completely new features not covered by existing files
-      4. **Preserve existing functionality** - don't remove features when making changes
+      - ❌ DO NOT create "ProductsPage.tsx" - HomePage.tsx already shows products
+      - ❌ DO NOT create "ProductPage.tsx" without checking if product details are in HomePage.tsx
+      - ❌ DO NOT create duplicate routing - App.tsx already handles routing
+      - ❌ DO NOT recreate product listing functionality - it already exists
+      - ❌ DO NOT create files without using 'view' tool first
       
-      ## If User Asks to "Build an E-Commerce Store":
+      ## ✅ When User Requests Changes:
+      
+      **STEP 1: ALWAYS use 'view' tool first** to see the current file contents
+      **STEP 2: Understand what already exists** before making any changes
+      **STEP 3: Use 'edit' tool** for modifications to existing files (< 1024 characters per edit)
+      **STEP 4: Only create new files** for completely new features not covered by existing files
+      **STEP 5: Preserve existing functionality** - don't remove features when making changes
+      
+      ## 📝 If User Asks About E-Commerce Features:
       
       Respond with:
-      "Great! This environment already has a complete e-commerce store with all the core features you mentioned. 
+      "Great! This environment already has a complete e-commerce store with all the core features. 
       Let me show you what's already implemented and we can customize or extend it based on your specific needs."
       
-      Then use the view tool to show them the existing files and explain the current features.
+      Then:
+      1. Use the 'view' tool to show them key existing files (start with src/App.tsx, src/pages/HomePage.tsx)
+      2. Explain what each file does
+      3. Ask what specific changes they'd like to make
+      4. Only then make the requested changes
       
-      ## User Default Workflow:
+      ## 🔄 User Default Workflow:
       
       After sign-in, users should:
       1. Run the seedMyAdmin mutation to grant themselves admin privileges
       2. Access the Admin Dashboard to create products
-      3. Shop as a regular user
+      3. Shop as a regular user (products display on HomePage)
+      
+      ## 🚨 REMINDER:
+      
+      - ALWAYS use 'view' tool before creating or modifying files
+      - HomePage.tsx IS the product listing page - don't create ProductsPage.tsx
+      - Check existing routing in App.tsx before adding new routes
+      - Modify existing files instead of creating duplicates
     </ecommerce_only>
 
     ${options.includeTemplate ? templateInfo() : ''}

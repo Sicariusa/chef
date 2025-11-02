@@ -187,6 +187,21 @@ export const models: Partial<
     provider: 'openrouter',
     requireKey: true,
   },
+  'mistral-small-3.2-24b': {
+    name: 'Mistral Small 3.2 24B (Free)',
+    provider: 'openrouter',
+    requireKey: true,
+  },
+  'deepcoder-14b': {
+    name: 'DeepCoder 14B (Free)',
+    provider: 'openrouter',
+    requireKey: true,
+  },
+  'deepseek-chat-v3': {
+    name: 'DeepSeek Chat V3 (Free)',
+    provider: 'openrouter',
+    requireKey: true,
+  },
 } as const;
 
 export const ModelSelector = React.memo(function ModelSelector({

@@ -89,6 +89,7 @@ export async function convexAgent(args: {
     openaiProxyEnabled: getEnv('OPENAI_PROXY_ENABLED') == '1',
     usingOpenAi: modelProvider == 'OpenAI',
     usingGoogle: modelProvider == 'Google',
+    usingOpenRouter: modelProvider == 'OpenRouter',
     resendProxyEnabled: getEnv('RESEND_PROXY_ENABLED') == '1',
     enableResend: featureFlags.enableResend,
   };
@@ -141,8 +142,8 @@ export async function convexAgent(args: {
         maxTokens: provider.maxTokens,
         providerOptions: provider.options,
         messages: messagesForDataStream,
-        tools,
-        toolChoice: shouldDisableTools ? 'none' : 'auto',
+        tools: modelProvider === 'OpenRouter' ? undefined : tools,
+        toolChoice: shouldDisableTools || modelProvider === 'OpenRouter' ? 'none' : 'auto',
         onFinish: (result) => {
           onFinishHandler({
             dataStream,
@@ -325,15 +326,51 @@ async function onFinishHandler({
   // Always stash this part's usage as an annotation -- these are used for
   // displaying usage info in the UI as well as calculating usage when the message
   // finishes.
-  if (result.finishReason === 'tool-calls') {
-    if (result.toolCalls.length === 1) {
-      toolCallId = { kind: 'tool-call', toolCallId: result.toolCalls[0].toolCallId };
+
+  // Handle text-based tool calls for OpenRouter models that don't support native tool calling
+  let modifiedResult = result;
+  if (modelProvider === 'OpenRouter' && result.finishReason === 'stop' && result.text) {
+    const text = result.text.trim();
+    const toolCallMatch = text.match(/TOOL_CALL:\s*(\w+)/i);
+    const paramsMatch = text.match(/PARAMETERS:\s*(\{.*?\})/i);
+
+    if (toolCallMatch && paramsMatch) {
+      const toolName = toolCallMatch[1];
+      const paramsText = paramsMatch[1];
+
+      try {
+        const args = JSON.parse(paramsText);
+        // Simulate a tool call result
+        const simulatedToolCall = {
+          type: 'tool-call' as const,
+          toolCallId: `text-based-${Date.now()}`,
+          toolName,
+          args,
+        };
+
+        // Create modified result with simulated tool call
+        modifiedResult = {
+          ...result,
+          toolCalls: [simulatedToolCall],
+          finishReason: 'tool-calls' as const,
+          text: text.replace(/TOOL_CALL:.*?(?=(\n\n|\n?$))/is, '').trim(),
+        };
+
+      } catch (error) {
+        logger.warn('Failed to parse text-based tool call for OpenRouter', { error, text });
+      }
+    }
+  }
+
+  if (modifiedResult.finishReason === 'tool-calls') {
+    if (modifiedResult.toolCalls.length === 1) {
+      toolCallId = { kind: 'tool-call', toolCallId: modifiedResult.toolCalls[0].toolCallId };
     } else {
       logger.warn('Stopped with not exactly one tool call', {
-        toolCalls: result.toolCalls,
+        toolCalls: modifiedResult.toolCalls,
       });
     }
-  } else if (result.finishReason === 'stop') {
+  } else if (modifiedResult.finishReason === 'stop') {
     toolCallId = { kind: 'final' };
   }
   if (toolCallId) {
@@ -344,18 +381,18 @@ async function onFinishHandler({
   }
 
   // Record usage once we've generated the final part.
-  if (result.finishReason === 'stop') {
+  if (modifiedResult.finishReason === 'stop') {
     await recordUsageCb(messages[messages.length - 1], { usage, providerMetadata });
   }
   if (recordRawPromptsForDebugging) {
-    const responseCoreMessages = result.response.messages as (CoreAssistantMessage | CoreToolMessage)[];
+    const responseCoreMessages = modifiedResult.response.messages as (CoreAssistantMessage | CoreToolMessage)[];
     // don't block the request but keep the request alive in Vercel Lambdas
     waitUntil(
       storeDebugPrompt(
         coreMessages,
         chatInitialId,
         responseCoreMessages,
-        result,
+        modifiedResult,
         {
           usage,
           providerMetadata,
@@ -465,7 +502,7 @@ async function storeDebugPrompt(
 
     const formData = new FormData();
     formData.append('metadata', JSON.stringify(metadata));
-    formData.append('promptCoreMessages', new Blob([compressedData]));
+    formData.append('promptCoreMessages', new Blob([new Uint8Array(compressedData)], { type: 'application/octet-stream' }));
 
     const response = await fetch(`${getConvexSiteUrl()}/upload_debug_prompt`, {
       method: 'POST',

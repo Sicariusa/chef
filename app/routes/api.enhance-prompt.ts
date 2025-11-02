@@ -271,7 +271,7 @@ export async function action({ request }: ActionFunctionArgs) {
       baseURL: 'https://openrouter.ai/api/v1',
     });
 
-    const model = openrouter('google/gemini-2.0-flash-exp:free');
+    const model = openrouter('meta-llama/llama-3.3-70b-instruct:free');
 
     const { text } = await generateText({
       model,

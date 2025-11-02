@@ -40,6 +40,9 @@ export function hasApiKeySet(
     case 'kimi-k2':
     case 'devstral-small-2505':
     case 'mai-ds-r1':
+    case 'mistral-small-3.2-24b':
+    case 'deepcoder-14b':
+    case 'deepseek-chat-v3':
       return !!apiKey.openrouter?.trim();
     default: {
       const _exhaustiveCheck: never = modelSelection;

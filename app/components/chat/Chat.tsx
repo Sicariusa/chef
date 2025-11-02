@@ -220,6 +220,9 @@ export const Chat = memo(
           'kimi-k2': { providerName: 'openrouter', apiKeyField: 'openrouter' },
           'devstral-small-2505': { providerName: 'openrouter', apiKeyField: 'openrouter' },
           'mai-ds-r1': { providerName: 'openrouter', apiKeyField: 'openrouter' },
+          'mistral-small-3.2-24b': { providerName: 'openrouter', apiKeyField: 'openrouter' },
+          'deepcoder-14b': { providerName: 'openrouter', apiKeyField: 'openrouter' },
+          'deepseek-chat-v3': { providerName: 'openrouter', apiKeyField: 'openrouter' },
         };
 
         // Get provider info for the current model
@@ -370,17 +373,20 @@ export const Chat = memo(
         } else if (modelSelection === 'mai-ds-r1') {
           modelProvider = 'OpenRouter';
           modelChoice = 'microsoft/mai-ds-r1:free';
+        } else if (modelSelection === 'mistral-small-3.2-24b') {
+          modelProvider = 'OpenRouter';
+          modelChoice = 'mistralai/mistral-small-3.2-24b-instruct:free';
+        } else if (modelSelection === 'deepcoder-14b') {
+          modelProvider = 'OpenRouter';
+          modelChoice = 'agentica-org/deepcoder-14b-preview:free';
+        } else if (modelSelection === 'deepseek-chat-v3') {
+          modelProvider = 'OpenRouter';
+          modelChoice = 'deepseek/deepseek-chat-v3-0324:free';
         } else {
           const _exhaustiveCheck: never = modelSelection;
           throw new Error(`Unknown model: ${_exhaustiveCheck}`);
         }
         let shouldDisableTools = false;
-
-        // Disable tools for ALL OpenRouter free models (most don't support tool use)
-        // If you want full tool support, use Google Gemini API directly instead
-        if (modelProvider === 'OpenRouter') {
-          shouldDisableTools = true;
-        }
 
         if (messages.length > 0 && messages[messages.length - 1].role === 'assistant') {
           const lastSystemMessage = messages[messages.length - 1];

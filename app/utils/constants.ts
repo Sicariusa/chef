@@ -44,6 +44,9 @@ export type ModelSelection =
   | 'nemotron-nano-9b-v2'
   | 'kimi-k2'
   | 'devstral-small-2505'
-  | 'mai-ds-r1';
+  | 'mai-ds-r1'
+  | 'mistral-small-3.2-24b'
+  | 'deepcoder-14b'
+  | 'deepseek-chat-v3';
 
 export const MAX_CONSECUTIVE_DEPLOY_ERRORS = 5;
