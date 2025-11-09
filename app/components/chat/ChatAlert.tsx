@@ -70,11 +70,10 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
             >
               <div className={classNames(' flex gap-2')}>
                 <button
-                  onClick={() =>
-                    postMessage(
-                      `*Fix this ${isPreview ? 'preview' : 'terminal'} error* \n\`\`\`${isPreview ? 'js' : 'sh'}\n${description}\n${content}\n\`\`\`\n`,
-                    )
-                  }
+                  onClick={() => {
+                    const language = isPreview ? 'js' : 'sh';
+                    postMessage(`*Fix this ${isPreview ? 'preview' : 'terminal'} error*\n\`\`\`${language}\n${description}\n${content}\n\`\`\`\n`);
+                  }}
                   className={classNames(
                     `px-2 py-1.5 rounded-md text-sm font-medium`,
                     'bg-bolt-elements-button-primary-background',
