@@ -13,9 +13,11 @@ This guide provides comprehensive information about deploying Chef-built project
 5. [Configuration Options](#configuration-options)
 6. [Troubleshooting](#troubleshooting)
 7. [Understanding the Deployment Flow](#understanding-the-deployment-flow)
-8. [File Format Handling](#file-format-handling)
-9. [Project Settings](#project-settings)
-10. [Best Practices](#best-practices)
+8. [URL Handling and Normalization](#url-handling-and-normalization)
+9. [File Format Handling](#file-format-handling)
+10. [Project Settings](#project-settings)
+11. [Deployment State Management](#deployment-state-management)
+12. [Best Practices](#best-practices)
 
 ## How It Works
 
@@ -94,6 +96,17 @@ pnpm run dev
    - "Deploying..." - Uploading to Vercel
    - "Deployed" ✓ - Success!
 4. **View Your Site**: Click "View site" to open your deployed application
+
+### Deployment State Persistence
+
+The deployment status and URL are automatically saved and persist across page refreshes:
+
+- **Automatic Storage**: When deployment succeeds, the URL is saved to browser localStorage
+- **Per-Project Storage**: Each project/chat has its own deployment URL stored separately
+- **Auto-Restore**: When you refresh the page or return to a project, the "View site" button automatically reappears with the correct URL
+- **URL Normalization**: The system ensures only valid Vercel URLs are stored (removes any Convex prefixes or invalid URLs)
+
+**Note**: The deployment status is stored locally in your browser. If you clear browser data or use a different browser, you'll need to deploy again.
 
 ### What Gets Deployed
 
@@ -214,6 +227,37 @@ Vercel receives the files and:
 3. Configures routing
 4. Returns deployment URL
 
+## URL Handling and Normalization
+
+### Automatic URL Normalization
+
+The deployment system automatically normalizes URLs to ensure only valid Vercel URLs are used:
+
+- **Removes Convex Prefixes**: Any URLs containing `.convex.app` domains are filtered out
+- **Ensures HTTPS**: URLs are automatically prefixed with `https://` if missing
+- **Validates Vercel Domain**: Only URLs containing `vercel.app` are accepted
+- **Handles Edge Cases**: Extracts Vercel URLs from embedded strings if needed
+
+### URL Storage
+
+- **LocalStorage Key**: `deployment_{chatId}` - Stores deployment URL per project
+- **Data Stored**: 
+  - `url`: The normalized Vercel deployment URL
+  - `updateCounter`: File update counter to detect if redeployment is needed
+- **Automatic Cleanup**: Invalid or non-Vercel URLs are automatically filtered out
+
+### Example URL Formats
+
+**Valid URLs** (accepted):
+- `https://my-project.vercel.app`
+- `https://my-project-abc123.vercel.app`
+- `my-project.vercel.app` (automatically prefixed with `https://`)
+
+**Invalid URLs** (filtered out):
+- `https://something.convex.app/...` (Convex domain)
+- `http://example.com` (not a Vercel domain)
+- Relative URLs without domain
+
 ## File Format Handling
 
 ### Text Files (Sent as UTF-8 Strings)
@@ -272,6 +316,44 @@ If you need different settings, you can:
 2. Get the `VERCEL_PROJECT_ID`
 3. Set it in your `.env.local`
 4. Vercel will use the project's existing settings
+
+## Deployment State Management
+
+### How State Persistence Works
+
+The deployment button maintains state across page refreshes using browser localStorage:
+
+1. **On Successful Deployment**:
+   - The Vercel URL is normalized (ensures it's a valid Vercel URL)
+   - URL and update counter are saved to localStorage with key `deployment_{chatId}`
+   - Button state changes to "Deployed" with "View site" button visible
+
+2. **On Page Load/Refresh**:
+   - Component checks localStorage for stored deployment URL
+   - If found and valid, restores the "Deployed" state
+   - "View site" button appears automatically
+
+3. **On Project Switch**:
+   - When switching to a different project (different chatId), the component loads that project's deployment status
+   - Each project maintains its own deployment state
+
+### State Storage Format
+
+```typescript
+{
+  url: "https://project-name.vercel.app",
+  updateCounter: 12345
+}
+```
+
+### Clearing Deployment State
+
+To clear a project's deployment state:
+1. Open browser DevTools (F12)
+2. Go to Application/Storage → Local Storage
+3. Find key `deployment_{chatId}` (replace `{chatId}` with your actual chat ID)
+4. Delete the entry
+5. Refresh the page
 
 ## Best Practices
 

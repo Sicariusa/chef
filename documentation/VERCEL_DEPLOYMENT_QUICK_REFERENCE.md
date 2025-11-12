@@ -38,6 +38,8 @@ Click "Deploy" button in Chef → Done! 🚀
 3. **Wait** for "Deployed" status
 4. **Click** "View site" to open
 
+**Note**: The deployment URL persists across page refreshes - the "View site" button will automatically reappear when you return!
+
 ---
 
 ## File Handling
@@ -93,6 +95,12 @@ Example:
 https://my-project-abc123-sicariusas-projects.vercel.app
 ```
 
+**URL Handling**:
+- ✅ URLs are automatically normalized (removes Convex prefixes)
+- ✅ Only valid Vercel URLs are stored
+- ✅ URLs persist across page refreshes
+- ✅ Each project has its own deployment URL stored separately
+
 ---
 
 ## What Gets Deployed
@@ -138,6 +146,7 @@ https://my-project-abc123-sicariusas-projects.vercel.app
 - "View site" button appears
 - Toast notification shows URL
 - Server logs show "Deployment successful"
+- **URL persists** - "View site" button remains after page refresh
 
 ---
 
@@ -185,6 +194,20 @@ https://my-project-abc123-sicariusas-projects.vercel.app
 💡 **Use Vercel dashboard** - View deployment history and logs
 
 💡 **Keep token secure** - Never commit to git
+
+💡 **Deployment persists** - URL is saved and "View site" button reappears after refresh
+
+💡 **URL normalization** - System automatically ensures only valid Vercel URLs are used
+
+---
+
+## State Persistence
+
+The deployment URL is automatically saved to browser localStorage:
+- **Key**: `deployment_{chatId}` (unique per project)
+- **Stored**: Vercel URL + file update counter
+- **Auto-restore**: "View site" button appears automatically on page load
+- **Per-project**: Each project maintains its own deployment state
 
 ---
 
