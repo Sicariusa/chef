@@ -107,7 +107,8 @@ https://vibrant-ant-636-7i29fje5m-sicariusas-projects.vercel.app
 ```
 
 **URL Handling**:
-- ✅ **Uses public domain** - Automatically selects the publicly accessible URL
+- ✅ **Uses public domain** - Constructs the public URL directly from the project name you provide
+- ✅ **Format**: `https://{project-name}.vercel.app` - Always uses the clean project name (no team suffixes)
 - ✅ URLs are automatically normalized (removes Convex prefixes)
 - ✅ Only valid Vercel URLs are stored
 - ✅ URLs persist across page refreshes

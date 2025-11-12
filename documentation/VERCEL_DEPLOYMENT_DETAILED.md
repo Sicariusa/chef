@@ -238,24 +238,26 @@ Vercel returns two types of URLs in the deployment response:
    - Example: `vibrant-ant-636-7i29fje5m-sicariusas-projects.vercel.app`
    - **Requires authentication** - Only accessible to team members
    - Used for internal deployment tracking
+   - **Not used by the system** - We construct the public URL directly
 
-2. **Public Domain** (`result.alias`):
+2. **Public Domain** (constructed from project name):
    - Format: `project-name.vercel.app`
    - Example: `vibrant-ant-636.vercel.app`
    - **Publicly accessible** - No authentication required
    - This is the URL users should visit
 
-**The system automatically uses the public domain URL** from the `alias` array, ensuring users get a publicly accessible link.
+**The system constructs the public domain URL directly** from the `projectName` you provide during deployment, ensuring you always get a clean, publicly accessible URL without team suffixes or deployment hashes.
 
-### Automatic URL Normalization
+### Automatic URL Construction
 
-The deployment system automatically normalizes URLs to ensure only valid Vercel URLs are used:
+The deployment system constructs the public URL directly from the project name you provide:
 
-- **Prefers Public Domain**: Uses `alias[0]` (public domain) over `url` (deployment URL)
+- **Uses Project Name**: Constructs `https://{projectName}.vercel.app` directly
+- **No Team Suffixes**: Ignores any team suffixes that may appear in Vercel's response
+- **Clean Public URL**: Always returns the simple public domain format
 - **Removes Convex Prefixes**: Any URLs containing `.convex.app` domains are filtered out
 - **Ensures HTTPS**: URLs are automatically prefixed with `https://` if missing
 - **Validates Vercel Domain**: Only URLs containing `vercel.app` are accepted
-- **Handles Edge Cases**: Extracts Vercel URLs from embedded strings if needed
 
 ### URL Storage
 
@@ -271,9 +273,9 @@ The deployment system automatically normalizes URLs to ensure only valid Vercel 
 - `https://my-project.vercel.app` - Public domain (no authentication)
 - `my-project.vercel.app` (automatically prefixed with `https://`)
 
-**Deployment URLs** (fallback only, requires auth):
+**Deployment URLs** (not used by system, for reference only):
 - `https://my-project-abc123-team.vercel.app` - Deployment URL (team access only)
-- Only used if no public domain alias is available
+- The system never uses these - always constructs the clean public URL
 
 **Invalid URLs** (filtered out):
 - `https://something.convex.app/...` (Convex domain)
@@ -471,8 +473,7 @@ The deployment process logs detailed information:
 [Deploy] Sending deployment request to Vercel...
 [Deploy] Vercel API response status: 200 OK
 [Deploy] Deployment successful! Parsing response...
-[Deploy] Deployment result: { id: 'dpl_...', url: 'my-project.vercel.app', ... }
-[Deploy] Final deployment URL: https://my-project.vercel.app
+[Deploy] Final public URL: https://my-project.vercel.app
 ```
 
 ## API Reference
@@ -495,7 +496,7 @@ The deployment process logs detailed information:
 }
 ```
 
-**Note**: The `url` field contains the **public domain URL** (from `alias[0]`), which is publicly accessible. The deployment URL (from `result.url`) is not returned as it requires authentication.
+**Note**: The `url` field contains the **public domain URL** constructed directly from the `deploymentName` you provide (format: `https://{deploymentName}.vercel.app`). This ensures you always get a clean, publicly accessible URL without team suffixes or deployment hashes.
 
 **Response** (Error):
 ```json
