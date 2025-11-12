@@ -25,7 +25,7 @@ type DeployStatus =
   | { type: 'zipping' }
   | { type: 'deploying' }
   | { type: 'error'; message: string }
-  | { type: 'success'; updateCounter: number };
+  | { type: 'success'; updateCounter: number; url?: string };
 
 export function DeployButton() {
   const [status, setStatus] = useState<DeployStatus>({ type: 'idle' });
@@ -86,12 +86,15 @@ export function DeployButton() {
       }
 
       const resp = await response.json();
-      if (resp.localDevWarning) {
+      
+      if (resp.url) {
+        toast.success(`Deployed successfully! Visit ${resp.url}`);
+      } else if (resp.localDevWarning) {
         toast.error(`${resp.localDevWarning}`);
       }
 
       const updateCounter = getFileUpdateCounter();
-      setStatus({ type: 'success', updateCounter });
+      setStatus({ type: 'success', updateCounter, url: resp.url });
       await recordDeploy({ id: chatId, sessionId });
     } catch (error) {
       toast.error('Failed to deploy. Please try again.');
@@ -160,9 +163,9 @@ export function DeployButton() {
       >
         {buttonText}
       </Button>
-      {status.type === 'success' && convex && (
+      {status.type === 'success' && status.url && (
         <Button
-          href={`https://${convex.deploymentName}.convex.app`}
+          href={status.url}
           target="_blank"
           size="xs"
           icon={<ExternalLinkIcon />}
