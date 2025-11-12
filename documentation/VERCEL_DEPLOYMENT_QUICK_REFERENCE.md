@@ -86,20 +86,33 @@ vercel ls
 
 ## Deployment URL Format
 
+**Public Domain** (used by default):
+```
+https://{project-name}.vercel.app
+```
+
+Example:
+```
+https://vibrant-ant-636.vercel.app
+```
+
+**Deployment URL** (fallback, requires auth):
 ```
 https://{project-name}-{hash}-{team}.vercel.app
 ```
 
 Example:
 ```
-https://my-project-abc123-sicariusas-projects.vercel.app
+https://vibrant-ant-636-7i29fje5m-sicariusas-projects.vercel.app
 ```
 
 **URL Handling**:
+- ✅ **Uses public domain** - Automatically selects the publicly accessible URL
 - ✅ URLs are automatically normalized (removes Convex prefixes)
 - ✅ Only valid Vercel URLs are stored
 - ✅ URLs persist across page refreshes
 - ✅ Each project has its own deployment URL stored separately
+- ✅ **No authentication required** - Public domain is accessible to everyone
 
 ---
 

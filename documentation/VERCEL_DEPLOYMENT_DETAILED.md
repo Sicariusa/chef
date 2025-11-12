@@ -229,10 +229,29 @@ Vercel receives the files and:
 
 ## URL Handling and Normalization
 
+### Public Domain vs Deployment URL
+
+Vercel returns two types of URLs in the deployment response:
+
+1. **Deployment URL** (`result.url`): 
+   - Format: `project-name-hash-team.vercel.app`
+   - Example: `vibrant-ant-636-7i29fje5m-sicariusas-projects.vercel.app`
+   - **Requires authentication** - Only accessible to team members
+   - Used for internal deployment tracking
+
+2. **Public Domain** (`result.alias`):
+   - Format: `project-name.vercel.app`
+   - Example: `vibrant-ant-636.vercel.app`
+   - **Publicly accessible** - No authentication required
+   - This is the URL users should visit
+
+**The system automatically uses the public domain URL** from the `alias` array, ensuring users get a publicly accessible link.
+
 ### Automatic URL Normalization
 
 The deployment system automatically normalizes URLs to ensure only valid Vercel URLs are used:
 
+- **Prefers Public Domain**: Uses `alias[0]` (public domain) over `url` (deployment URL)
 - **Removes Convex Prefixes**: Any URLs containing `.convex.app` domains are filtered out
 - **Ensures HTTPS**: URLs are automatically prefixed with `https://` if missing
 - **Validates Vercel Domain**: Only URLs containing `vercel.app` are accepted
@@ -248,10 +267,13 @@ The deployment system automatically normalizes URLs to ensure only valid Vercel 
 
 ### Example URL Formats
 
-**Valid URLs** (accepted):
-- `https://my-project.vercel.app`
-- `https://my-project-abc123.vercel.app`
+**Public Domain URLs** (preferred, used by default):
+- `https://my-project.vercel.app` - Public domain (no authentication)
 - `my-project.vercel.app` (automatically prefixed with `https://`)
+
+**Deployment URLs** (fallback only, requires auth):
+- `https://my-project-abc123-team.vercel.app` - Deployment URL (team access only)
+- Only used if no public domain alias is available
 
 **Invalid URLs** (filtered out):
 - `https://something.convex.app/...` (Convex domain)
@@ -472,6 +494,8 @@ The deployment process logs detailed information:
   "message": "Deployment successful"
 }
 ```
+
+**Note**: The `url` field contains the **public domain URL** (from `alias[0]`), which is publicly accessible. The deployment URL (from `result.url`) is not returned as it requires authentication.
 
 **Response** (Error):
 ```json

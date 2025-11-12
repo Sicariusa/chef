@@ -191,20 +191,16 @@ export async function deploy({ request }: ActionFunctionArgs) {
 
     console.log('[Deploy] Deployment successful! Parsing response...');
     const result = await response.json();
-    console.log('[Deploy] Deployment result:', {
-      id: result.id,
-      url: result.url,
-      alias: result.alias,
-      name: result.name,
-    });
-
-    // Extract deployment URL from response
-    const deploymentUrl = result.url || result.alias?.[0] || `https://${result.name || projectName}.vercel.app`;
-    console.log('[Deploy] Final deployment URL:', deploymentUrl);
+    
+    // Prefer alias (public domain) over url (deployment URL requires auth)
+    const deploymentUrl = result.alias?.[0] || result.url || `https://${result.name || projectName}.vercel.app`;
+    const finalUrl = deploymentUrl.startsWith('http') ? deploymentUrl : `https://${deploymentUrl}`;
+    
+    console.log('[Deploy] Final deployment URL:', finalUrl);
 
     return json({
       success: true,
-      url: deploymentUrl,
+      url: finalUrl,
       deploymentId: result.id,
       message: 'Deployment successful',
     });
