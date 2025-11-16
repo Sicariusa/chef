@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const videos = [
-  '/videos/video-6.mp4',
-  '/videos/video-3.mp4',
-  '/videos/video-4.mp4',
-  '/videos/video-5.mp4',
+  // '/videos/video-3.mp4',
+  // '/videos/video-4.mp4',
+  'https://cdn.builder.io/o/assets%2F6cb30fdd1d254ba19be5ae22f1b872ab%2F9396007060b543b0b1c246e955489540?alt=media&token=90aadbb4-1c0b-445c-b58c-9c7da2820c76&apiKey=6cb30fdd1d254ba19be5ae22f1b872ab',
+  'https://cdn.builder.io/o/assets%2F6cb30fdd1d254ba19be5ae22f1b872ab%2F36f8a09ed0a44b2db574c3b77f1f5313?alt=media&token=cd3d58f9-2342-4e46-99f7-2b3afc9a5288&apiKey=6cb30fdd1d254ba19be5ae22f1b872ab',
+  'https://cdn.builder.io/o/assets%2F6cb30fdd1d254ba19be5ae22f1b872ab%2F9c063e24199842ebae4808f2d001498c?alt=media&token=64f1bc87-33f7-41a0-82ea-53f8a68720c5&apiKey=6cb30fdd1d254ba19be5ae22f1b872ab',
+  'https://cdn.builder.io/o/assets%2F6cb30fdd1d254ba19be5ae22f1b872ab%2F66b6423009474c599cff53f7cf427797%2Fcompressed?apiKey=6cb30fdd1d254ba19be5ae22f1b872ab&token=66b6423009474c599cff53f7cf427797&alt=media&optimized=true',
+   
 ];
 
 export const slogans = [
@@ -41,9 +44,18 @@ export function HeroVideoBackground() {
     videoRefs.current.forEach((video, index) => {
       if (video) {
         if (index === currentVideoIndex) {
-          video.play().catch(() => {
-            // Handle autoplay restrictions
-          });
+          // Ensure video is loaded before playing
+          if (video.readyState >= 2) {
+            video.play().catch((err) => {
+              console.error('Video play error:', err);
+            });
+          } else {
+            video.addEventListener('loadeddata', () => {
+              video.play().catch((err) => {
+                console.error('Video play error:', err);
+              });
+            }, { once: true });
+          }
         } else {
           video.pause();
           video.currentTime = 0;
@@ -69,6 +81,14 @@ export function HeroVideoBackground() {
                 muted
                 loop
                 playsInline
+                crossOrigin="anonymous"
+                preload="auto"
+                onError={(e) => {
+                  console.error('Video loading error:', e);
+                }}
+                onLoadedData={() => {
+                  console.log('Video loaded successfully');
+                }}
                 className="absolute inset-0 w-full h-full object-cover"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -119,11 +139,11 @@ export function HeroTextContent() {
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className="relative"
     >
-      {/* Enhanced animated gradient background glow */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-util-accent/25 via-util-info/25 to-util-accent/25 blur-3xl opacity-70 animate-pulse" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-l from-util-info/15 via-util-accent/15 to-util-info/15 blur-2xl opacity-50 animate-pulse [animation-delay:1s]" />
+      {/* Premium animated gradient background glow - aligned with video colors */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-teal-500/20 via-purple-500/20 to-cyan-500/20 blur-3xl opacity-60 animate-pulse" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-l from-indigo-500/15 via-teal-500/15 to-violet-500/15 blur-2xl opacity-40 animate-pulse [animation-delay:1s]" />
 
-      <h1 className="relative mb-4 font-display text-5xl font-black leading-[1.1] tracking-tight text-white md:text-6xl lg:text-7xl xl:text-8xl drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
+      <h1 className="relative mb-4 font-display text-5xl font-black leading-[1.05] tracking-[-0.02em] text-white md:text-6xl lg:text-7xl xl:text-8xl drop-shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
         <div className="block">
           <AnimatePresence mode="wait">
             <motion.span
@@ -132,7 +152,12 @@ export function HeroTextContent() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5, ease: 'easeInOut' }}
-              className="inline-block bg-gradient-to-r from-white via-util-accent to-util-info bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient-shift drop-shadow-[0_0_30px_rgba(99,168,248,0.5)]"
+              className="inline-block bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient-shift drop-shadow-[0_0_30px_rgba(94,234,212,0.5)]"
+              style={{
+                backgroundImage: 'linear-gradient(to right, #ffffff, #e0f2fe, #5eead4, #2dd4bf, #67e8f9, #a5f3fc, #cffafe)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
             >
               {slogans[currentSloganIndex]}
             </motion.span>
@@ -146,7 +171,12 @@ export function HeroTextContent() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5, delay: 0.1, ease: 'easeInOut' }}
-              className="inline-block bg-gradient-to-r from-util-info via-util-accent to-white bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient-shift [animation-delay:0.5s] drop-shadow-[0_0_30px_rgba(141,38,118,0.5)]"
+              className="inline-block bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient-shift [animation-delay:0.5s] drop-shadow-[0_0_30px_rgba(139,92,246,0.5)]"
+              style={{
+                backgroundImage: 'linear-gradient(to right, #0d9488, #14b8a6, #2dd4bf, #5eead4, #a78bfa, #c4b5fd, #e9d5ff, #faf5ff)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
             >
               {taglines[currentTaglineIndex]}
             </motion.span>
@@ -158,7 +188,7 @@ export function HeroTextContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        className="mx-auto mb-12 max-w-3xl text-lg font-medium text-white/90 md:text-xl lg:text-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
+        className="mx-auto mb-12 max-w-3xl text-lg font-display font-medium text-slate-100/98 md:text-xl lg:text-2xl tracking-wide drop-shadow-[0_2px_15px_rgba(0,0,0,0.6)]"
       >
         Create a complete online store with products, shopping cart, checkout, and admin dashboard—all powered by AI
       </motion.p>
