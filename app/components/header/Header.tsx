@@ -61,10 +61,6 @@ export function Header({ hideSidebarIcon = false }: { hideSidebarIcon?: boolean 
             }}
           />
         )}
-        <a href="/">
-          {/* The logo is shifted up slightly, to visually align it with the hamburger icon. */}
-          <img src="/chef.svg" alt="Chef logo" width={72} height={42} className="relative -top-1" />
-        </a>
         <a
           href="https://github.com/get-convex/chef"
           target="_blank"

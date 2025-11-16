@@ -1,4 +1,32 @@
 .BaseChat {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(99, 168, 248, 0.15) 0%, transparent 60%),
+      radial-gradient(circle at 80% 80%, rgba(141, 38, 118, 0.12) 0%, transparent 60%),
+      radial-gradient(circle at 50% 20%, rgba(7, 192, 232, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, rgba(38, 135, 246, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 100% 0%, rgba(99, 168, 248, 0.06) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+    animation: gradientShift 30s ease infinite;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      linear-gradient(180deg, transparent 0%, rgba(99, 168, 248, 0.04) 50%, transparent 100%),
+      linear-gradient(90deg, transparent 0%, rgba(141, 38, 118, 0.02) 50%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
   &[data-chat-visible='false'] {
     --workbench-inner-width: 100%;
     --workbench-left: 0;
@@ -6,7 +34,8 @@
     .Chat {
       --at-apply: bolt-ease-cubic-bezier;
       transition-property: transform, opacity;
-      transition-duration: 0.3s;
+      transition-duration: 0.4s;
+      transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
       will-change: transform, opacity;
       transform: translateX(-50%);
       opacity: 0;
@@ -16,6 +45,53 @@
 
 .Chat {
   opacity: 1;
+  position: relative;
+  z-index: 1;
+  
+  /* Smooth scroll behavior */
+  scroll-behavior: smooth;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-shift {
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* Enhanced glow effect for text */
+@keyframes text-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px rgba(99, 168, 248, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 40px rgba(99, 168, 248, 0.5));
+  }
+}
+
+/* Feature card hover animation */
+@keyframes feature-card-glow {
+  0%, 100% {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  50% {
+    box-shadow: 0 10px 15px -3px rgba(99, 168, 248, 0.2), 0 4px 6px -2px rgba(99, 168, 248, 0.1);
+  }
 }
 
 .PromptEffectContainer {
