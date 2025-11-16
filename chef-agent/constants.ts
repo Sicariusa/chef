@@ -13,12 +13,30 @@ export const SUGGESTIONS = [
   },
 ];
 
-export const ECOMMERCE_FEATURES = [
-  { icon: '🛍️', text: 'Product Catalog' },
-  { icon: '🛒', text: 'Shopping Cart' },
-  { icon: '💰', text: 'Checkout Process' },
-  { icon: '👤', text: 'Admin Dashboard' },
+// Initial features shown by default
+export const INITIAL_FEATURES = [
+  { icon: '🗄️', text: 'Database with Convex' },
+  { icon: '🔐', text: 'Authentication' },
+  { icon: '⚡', text: 'Real-time Preview' },
+  { icon: '📁', text: 'File Storage' },
+  { icon: '🚀', text: 'Deploy to Production' },
+  { icon: '🚨', text: 'Error Handling' },
 ];
+
+// Additional features shown when "See More" is clicked
+export const ADDITIONAL_FEATURES = [
+  { icon: '📊', text: 'Order Dashboard' },
+  { icon: '👑', text: 'Admin Dashboard' },
+  { icon: '🛠️', text: 'Product Management' },
+  { icon: '🎯', text: 'Category Management' },
+  { icon: '🚨', text: 'Error Handling' },
+  { icon: '⏪', text: 'Rewind Feature' },
+  { icon: '📥', text: 'Download Code' },
+  
+];
+
+// All features combined (for backward compatibility)
+export const ECOMMERCE_FEATURES = [...INITIAL_FEATURES, ...ADDITIONAL_FEATURES];
 
 export const WORK_DIR_NAME = 'project';
 export const WORK_DIR = `/home/${WORK_DIR_NAME}`;

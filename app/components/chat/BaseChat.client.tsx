@@ -22,12 +22,14 @@ import { CompatibilityWarnings } from '~/components/CompatibilityWarnings.client
 import { chooseExperience } from '~/utils/experienceChooser';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useStore } from '@nanostores/react';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { SubchatBar } from './SubchatBar';
 import { SubchatLimitNudge } from './SubchatLimitNudge';
 import { useMutation } from 'convex/react';
 import { api } from '@convex/_generated/api';
 import { subchatIndexStore, useIsSubchatLoaded } from '~/lib/stores/subchats';
-import { ECOMMERCE_FEATURES } from 'chef-agent/constants';
+import { INITIAL_FEATURES, ADDITIONAL_FEATURES } from 'chef-agent/constants';
+import { HeroVideoBackground, HeroTextContent } from './AnimatedHero.client';
 
 interface BaseChatProps {
   // Refs
@@ -99,6 +101,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const isStreaming = streamStatus === 'streaming' || streamStatus === 'submitted';
     const recommendedExperience = chooseExperience(navigator.userAgent, window.crossOriginIsolated);
     const [chatEnabled, setChatEnabled] = useState(recommendedExperience === 'the-real-thing');
+    const [showMoreFeatures, setShowMoreFeatures] = useState(false);
     const currentSubchatIndex = useStore(subchatIndexStore) ?? 0;
     const { newChatFeature, minMessagesForNudge } = useLaunchDarkly();
     const shouldShowNudge = newChatFeature && messages.length > minMessagesForNudge;
@@ -176,42 +179,16 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 'pt-6': chatStarted,
               })}
             >
-              {/* Modern gradient background overlay with enhanced depth */}
-              <div className="absolute inset-0 bg-gradient-to-br from-background-primary via-background-secondary/40 to-background-primary pointer-events-none" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-util-accent/5 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-util-info/5 via-transparent to-transparent pointer-events-none" />
+              {/* Video background - only show when chat hasn't started */}
+              {!chatStarted && <HeroVideoBackground />}
               
-              {!chatStarted && (
-                <div id="intro" className="relative mx-auto mb-12 mt-16 max-w-5xl px-4 text-center md:mt-20 lg:px-0">
-                  <motion.div
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative"
-                  >
-                    {/* Enhanced animated gradient background glow */}
-                    <div className="absolute inset-0 -z-10 bg-gradient-to-r from-util-accent/25 via-util-info/25 to-util-accent/25 blur-3xl opacity-70 animate-pulse" />
-                    <div className="absolute inset-0 -z-10 bg-gradient-to-l from-util-info/15 via-util-accent/15 to-util-info/15 blur-2xl opacity-50 animate-pulse [animation-delay:1s]" />
-                    
-                    <h1 className="relative mb-4 font-display text-5xl font-black leading-[1.1] tracking-tight text-content-primary md:text-6xl lg:text-7xl xl:text-8xl">
-                      <span className="block bg-gradient-to-r from-content-primary via-util-accent to-util-info bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient-shift drop-shadow-[0_0_30px_rgba(99,168,248,0.3)]">
-                        Build your
-                      </span>
-                      <span className="block mt-2 bg-gradient-to-r from-util-info via-util-accent to-content-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient-shift [animation-delay:0.5s] drop-shadow-[0_0_30px_rgba(141,38,118,0.3)]">
-                        e-commerce store
-                      </span>
-                    </h1>
-                    
-                    <motion.p
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      className="mx-auto mb-12 max-w-3xl text-lg font-medium text-content-secondary md:text-xl lg:text-2xl"
-                    >
-                      Create a complete online store with products, shopping cart, checkout, and admin dashboard—all powered by AI
-                    </motion.p>
-                  </motion.div>
-                </div>
+              {/* Modern gradient background overlay with enhanced depth - only show when chat started */}
+              {chatStarted && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-br from-background-primary via-background-secondary/40 to-background-primary pointer-events-none" />
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-util-accent/5 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-util-info/5 via-transparent to-transparent pointer-events-none" />
+                </>
               )}
               <div
                 className={classNames('w-full relative z-10', {
@@ -220,6 +197,11 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 })}
                 ref={scrollRef}
               >
+                {!chatStarted && (
+                  <div id="intro" className="relative mx-auto mb-12 mt-16 max-w-5xl px-4 text-center md:mt-20 lg:px-0">
+                    <HeroTextContent />
+                  </div>
+                )}
                 {chatStarted ? (
                   <>
                     {newChatFeature && (
@@ -358,24 +340,80 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                              className="mx-auto mt-6 flex max-w-3xl flex-wrap items-center justify-center gap-3 md:gap-4"
+                              className="mx-auto mt-6 max-w-3xl"
                             >
-                              {ECOMMERCE_FEATURES.map((feature, index) => (
-                                <motion.div
-                                  key={feature.text}
-                                  initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                                  transition={{ duration: 0.4, delay: 0.5 + index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                                  className="group relative flex items-center gap-2 rounded-xl border border-content-tertiary/20 bg-gradient-to-br from-background-secondary/50 to-background-secondary/30 px-4 py-2.5 backdrop-blur-md transition-all duration-300 hover:border-util-accent/40 hover:bg-gradient-to-br hover:from-background-secondary/70 hover:to-background-secondary/50 hover:shadow-lg hover:shadow-util-accent/10 hover:-translate-y-0.5"
-                                >
-                                  <span className="text-xl transition-transform duration-300 group-hover:scale-110">{feature.icon}</span>
-                                  <span className="text-xs font-semibold text-content-secondary transition-colors duration-300 group-hover:text-content-primary md:text-sm">
-                                    {feature.text}
-                                  </span>
-                                  {/* Subtle glow effect on hover */}
-                                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-util-accent/0 via-util-accent/5 to-util-accent/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                                </motion.div>
-                              ))}
+                              <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
+                                {INITIAL_FEATURES.map((feature, index) => (
+                                  <motion.div
+                                    key={feature.text}
+                                    initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    transition={{ duration: 0.4, delay: 0.5 + index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                                    className="group relative flex items-center gap-2 rounded-xl border border-content-tertiary/20 bg-gradient-to-br from-background-secondary/50 to-background-secondary/30 px-4 py-2.5 backdrop-blur-md transition-all duration-300 hover:border-util-accent/40 hover:bg-gradient-to-br hover:from-background-secondary/70 hover:to-background-secondary/50 hover:shadow-lg hover:shadow-util-accent/10 hover:-translate-y-0.5"
+                                  >
+                                    <span className="text-xl transition-transform duration-300 group-hover:scale-110">{feature.icon}</span>
+                                    <span className="text-xs font-semibold text-content-secondary transition-colors duration-300 group-hover:text-content-primary md:text-sm">
+                                      {feature.text}
+                                    </span>
+                                    {/* Subtle glow effect on hover */}
+                                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-util-accent/0 via-util-accent/5 to-util-accent/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                                  </motion.div>
+                                ))}
+                              </div>
+                              
+                              {/* Additional features with expand/collapse */}
+                              <AnimatePresence>
+                                {showMoreFeatures && (
+                                  <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="mt-3 flex flex-wrap items-center justify-center gap-3 md:gap-4">
+                                      {ADDITIONAL_FEATURES.map((feature, index) => (
+                                        <motion.div
+                                          key={feature.text}
+                                          initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                                          exit={{ opacity: 0, scale: 0.8 }}
+                                          transition={{ duration: 0.3, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                                          className="group relative flex items-center gap-2 rounded-xl border border-content-tertiary/20 bg-gradient-to-br from-background-secondary/50 to-background-secondary/30 px-4 py-2.5 backdrop-blur-md transition-all duration-300 hover:border-util-accent/40 hover:bg-gradient-to-br hover:from-background-secondary/70 hover:to-background-secondary/50 hover:shadow-lg hover:shadow-util-accent/10 hover:-translate-y-0.5"
+                                        >
+                                          <span className="text-xl transition-transform duration-300 group-hover:scale-110">{feature.icon}</span>
+                                          <span className="text-xs font-semibold text-content-secondary transition-colors duration-300 group-hover:text-content-primary md:text-sm">
+                                            {feature.text}
+                                          </span>
+                                          {/* Subtle glow effect on hover */}
+                                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-util-accent/0 via-util-accent/5 to-util-accent/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                                        </motion.div>
+                                      ))}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                              
+                              {/* See More / See Less button */}
+                              <motion.button
+                                onClick={() => setShowMoreFeatures(!showMoreFeatures)}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.4, delay: 0.7 }}
+                                className="mx-auto mt-4 flex items-center gap-2 rounded-full border border-content-tertiary/20 bg-gradient-to-br from-background-secondary/50 to-background-secondary/30 px-4 py-2 text-xs font-semibold text-content-secondary transition-all duration-300 hover:border-util-accent/40 hover:bg-gradient-to-br hover:from-background-secondary/70 hover:to-background-secondary/50 hover:text-content-primary md:text-sm"
+                              >
+                                {showMoreFeatures ? (
+                                  <>
+                                    <span>See Less</span>
+                                    <ChevronUpIcon className="size-4" />
+                                  </>
+                                ) : (
+                                  <>
+                                    <span>See More</span>
+                                    <ChevronDownIcon className="size-4" />
+                                  </>
+                                )}
+                              </motion.button>
                             </motion.div>
                           )}
                         </>
