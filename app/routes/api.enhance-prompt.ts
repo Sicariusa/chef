@@ -265,13 +265,14 @@ export async function action({ request }: ActionFunctionArgs) {
       });
     }
 
-    // Use OpenRouter with a free model (gemini-2.0-flash-exp)
+    // Use OpenRouter with a free model (mistral-ai or llama)
     const openrouter = createOpenAI({
       apiKey: getEnv('OPENROUTER_API_KEY') || '',
       baseURL: 'https://openrouter.ai/api/v1',
     });
 
-    const model = openrouter('google/gemini-2.0-flash-exp:free');
+    // Try mistral-ai first, fallback to llama if needed
+    const model = openrouter('mistralai/mistral-7b-instruct:free');
 
     const { text } = await generateText({
       model,
