@@ -29,7 +29,6 @@ export const ADDITIONAL_FEATURES = [
   { icon: '👑', text: 'Admin Dashboard' },
   { icon: '🛠️', text: 'Product Management' },
   { icon: '🎯', text: 'Category Management' },
-  { icon: '🚨', text: 'Error Handling' },
   { icon: '⏪', text: 'Rewind Feature' },
   { icon: '📥', text: 'Download Code' },
   
