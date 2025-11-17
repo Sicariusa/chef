@@ -38,8 +38,8 @@ export async function loader() {
 export const links: LinksFunction = () => [
   {
     rel: 'icon',
-    href: '/favicon.svg',
-    type: 'image/svg+xml',
+    href: 'https://img.icons8.com/color/96/artificial-intelligence.png',
+    type: 'image/png',
   },
   { rel: 'stylesheet', href: globalStyles },
   { rel: 'stylesheet', href: xtermStyles },

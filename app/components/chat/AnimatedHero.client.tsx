@@ -65,7 +65,7 @@ export function HeroVideoBackground() {
   }, [currentVideoIndex]);
 
   return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
+    <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
       {/* Video backgrounds */}
       <div className="absolute inset-0">
         {videos.map((videoSrc, index) => (

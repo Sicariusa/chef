@@ -163,6 +163,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       <div
         ref={ref}
         className={classNames(styles.BaseChat, 'relative flex h-full w-full overflow-hidden')}
+        style={{ zIndex: 1 }}
         data-chat-visible={showChat}
         data-messages-for-evals={dataForEvals}
       >

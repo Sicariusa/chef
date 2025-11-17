@@ -7,11 +7,11 @@ import { Homepage } from '~/components/Homepage.client';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'Chef by Convex | Generate realtime full‑stack apps' },
-    { name: 'description', content: 'Cook up something hot with Chef, the full-stack AI coding agent from Convex' },
+    { title: 'LCNC agent ' },
+    { name: 'description', content: 'LCNC agent' },
     {
       property: 'og:image',
-      content: '/social_preview_index.png',
+      content: 'https://img.icons8.com/color/512/artificial-intelligence.png',
     },
   ];
 };

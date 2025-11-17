@@ -1,5 +1,6 @@
 import { motion, type Variants } from 'framer-motion';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
 import { ConfirmationDialog } from '@ui/ConfirmationDialog';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
@@ -49,6 +50,7 @@ interface MenuProps {
 
 export const Menu = memo(({ isOpen, onClose }: MenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const sessionId = useConvexSessionIdOrNullOrLoading();
   const convex = useConvex();
   const list = useQuery(api.messages.getAll, sessionId ? { sessionId } : 'skip') ?? [];
@@ -114,6 +116,10 @@ export const Menu = memo(({ isOpen, onClose }: MenuProps) => {
   };
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Element;
 
@@ -145,21 +151,19 @@ export const Menu = memo(({ isOpen, onClose }: MenuProps) => {
     return null;
   }
 
-  return (
-    <>
-      <motion.div
-        ref={menuRef}
-        initial="closed"
-        animate={isOpen ? 'open' : 'closed'}
-        variants={menuVariants}
-        style={{ width: '340px' }}
-        className={classNames(
-          'flex flex-col side-menu fixed top-0 h-full',
-          'bg-[var(--bolt-elements-sidebar-background)] border-r',
-          'shadow-sm text-sm',
-          'z-30',
-        )}
-      >
+  const menuContent = (
+    <motion.div
+      ref={menuRef}
+      initial="closed"
+      animate={isOpen ? 'open' : 'closed'}
+      variants={menuVariants}
+      style={{ width: '340px', zIndex: 9999 }}
+      className={classNames(
+        'flex flex-col side-menu fixed top-0 h-full',
+        'bg-[var(--bolt-elements-sidebar-background)] border-r',
+        'shadow-sm text-sm',
+      )}
+    >
         <div className="flex h-[var(--header-height)] items-center justify-between border-b px-4"></div>
 
         <div className="flex size-full flex-1 flex-col overflow-hidden">
@@ -249,8 +253,13 @@ export const Menu = memo(({ isOpen, onClose }: MenuProps) => {
           </div>
         </div>
       </motion.div>
-    </>
   );
+
+  if (!mounted) {
+    return null;
+  }
+
+  return createPortal(menuContent, document.body);
 });
 
 Menu.displayName = 'Menu';

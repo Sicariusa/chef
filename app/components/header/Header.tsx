@@ -49,7 +49,7 @@ export function Header({ hideSidebarIcon = false }: { hideSidebarIcon?: boolean 
   };
 
   return (
-    <header className="relative flex h-[var(--header-height)] items-center overflow-x-auto overflow-y-hidden border-b border-white/10 bg-gradient-to-b from-black/40 via-black/30 to-transparent backdrop-blur-xl p-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
+    <header className="relative z-50 flex h-[var(--header-height)] items-center overflow-x-auto overflow-y-hidden border-b border-white/10 bg-gradient-to-b from-black/40 via-black/30 to-transparent backdrop-blur-xl p-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
       {/* Premium gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 via-transparent to-violet-500/5 pointer-events-none" />
       
