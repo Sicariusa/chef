@@ -23,6 +23,15 @@ export const hasConnectedConvexProject = query({
   },
 });
 
+function isProvisioningEnabled() {
+  const flag = process.env.ENABLE_CONVEX_PROVISIONING;
+  if (!flag) {
+    return false;
+  }
+  const normalized = flag.toLowerCase();
+  return normalized === "true" || normalized === "1";
+}
+
 export const loadConnectedConvexProjectCredentials = query({
   args: {
     sessionId: v.id("sessions"),
@@ -110,6 +119,12 @@ export async function startProvisionConvexProjectHelper(
     };
   },
 ): Promise<void> {
+  if (!isProvisioningEnabled()) {
+    throw new ConvexError({
+      code: "NotAuthorized",
+      message: "Convex project provisioning is disabled",
+    });
+  }
   const chat = await getChatByIdOrUrlIdEnsuringAccess(ctx, { id: args.chatId, sessionId: args.sessionId });
   if (!chat) {
     throw new ConvexError({ code: "NotAuthorized", message: "Chat not found" });
@@ -241,6 +256,12 @@ async function _connectConvexProjectForMember(
   projectDeployKey: string;
   warningMessage: string | undefined;
 }> {
+  if (!isProvisioningEnabled()) {
+    throw new ConvexError({
+      code: "NotAuthorized",
+      message: "Convex project provisioning is disabled",
+    });
+  }
   const bigBrainHost = ensureEnvVar("BIG_BRAIN_HOST");
   let projectName: string | null = null;
   let timeElapsed = 0;
