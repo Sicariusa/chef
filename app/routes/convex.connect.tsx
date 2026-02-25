@@ -8,11 +8,16 @@ export const meta: MetaFunction = () => {
 };
 
 const dashboardHost = import.meta.env.VITE_DASHBOARD_HOST || 'https://dashboard.convex.dev';
+const provisioningEnabled =
+  (import.meta.env.VITE_ENABLE_CONVEX_PROVISIONING ?? '').toLowerCase() === 'true';
 
 export default function ConvexConnect() {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
+    if (!provisioningEnabled) {
+      return;
+    }
     const params = new URLSearchParams(searchParams);
     const authUrl = `${dashboardHost}/oauth/authorize/project?${params.toString()}`;
     window.location.href = authUrl;
@@ -20,7 +25,7 @@ export default function ConvexConnect() {
 
   return (
     <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#f9f7ee' }}>
-      <Spinner />
+      {provisioningEnabled ? <Spinner /> : <p>Convex project connection is disabled.</p>}
     </div>
   );
 }

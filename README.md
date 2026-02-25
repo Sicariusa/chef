@@ -102,6 +102,28 @@ Congratulations, you now have Chef running locally! You can log in to Chef with 
 
 Note: Chef is accessible at http://127.0.0.1:{port}/ and will not work properly on http://localhost:{port}/.
 
+## Auth configuration
+
+This fork keeps the default WorkOS‑based user authentication but hardens how Convex OAuth is used for project provisioning.
+
+- **User authentication**
+  - Implemented with WorkOS AuthKit and a `customJwt` provider in `convex/auth.config.ts`.
+  - Public, non‑secret values exposed to the browser:
+    - `VITE_WORKOS_CLIENT_ID`
+    - `VITE_WORKOS_API_HOSTNAME`
+    - `WORKOS_REDIRECT_URI` (redirect URL for the WorkOS application)
+- **Convex project provisioning**
+  - Uses a Convex OAuth application configured in the Convex dashboard.
+  - Secrets are **server‑side only**:
+    - `CONVEX_OAUTH_CLIENT_ID`
+    - `CONVEX_OAUTH_CLIENT_SECRET`
+    - `BIG_BRAIN_HOST` (defaults to `https://api.convex.dev`)
+  - Provisioning can be turned on/off with:
+    - `ENABLE_CONVEX_PROVISIONING` (Convex/server)
+    - `VITE_ENABLE_CONVEX_PROVISIONING` (client, used to hide the `/convex/connect` UI)
+
+For a deeper walkthrough of how Convex OAuth is used and what “Unverified” means for your OAuth app, see [`docs/convex-provisioning-auth.md`](docs/convex-provisioning-auth.md).
+
 ## Repository Layout
 
 - `app/` contains all of the client side code and some serverless APIs.

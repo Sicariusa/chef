@@ -1,6 +1,4 @@
 import { useConvex } from 'convex/react';
-
-import { useConvexAuth } from 'convex/react';
 import { createContext, useContext, useEffect, useRef } from 'react';
 
 import { sessionIdStore } from '~/lib/stores/sessionId';
@@ -12,7 +10,7 @@ import { api } from '@convex/_generated/api';
 import { toast } from 'sonner';
 import { fetchOptIns } from '~/lib/convexOptins';
 import { setChefDebugProperty } from 'chef-agent/utils/chefDebug';
-import { useAuth } from '@workos-inc/authkit-react';
+import { useAppAuth } from '~/lib/auth/useAppAuth';
 type ChefAuthState =
   | {
       kind: 'loading';
@@ -56,14 +54,13 @@ export const ChefAuthProvider = ({
 }) => {
   const sessionId = useConvexSessionIdOrNullOrLoading();
   const convex = useConvex();
-  const { isAuthenticated, isLoading: isConvexAuthLoading } = useConvexAuth();
+  const { isAuthenticated, isLoading: isAuthLoading, getAccessToken } = useAppAuth();
   const [sessionIdFromLocalStorage, setSessionIdFromLocalStorage] = useLocalStorage<Id<'sessions'> | null>(
     SESSION_ID_KEY,
     null,
   );
   const hasAlertedAboutOptIns = useRef(false);
   const authRetries = useRef(0);
-  const { getAccessToken } = useAuth();
 
   useEffect(() => {
     function setSessionId(sessionId: Id<'sessions'> | null) {
@@ -74,7 +71,7 @@ export const ChefAuthProvider = ({
       }
     }
 
-    const isUnauthenticated = !isAuthenticated && !isConvexAuthLoading;
+    const isUnauthenticated = !isAuthenticated && !isAuthLoading;
 
     if (sessionId === undefined && isUnauthenticated) {
       setSessionId(null);
@@ -159,13 +156,13 @@ export const ChefAuthProvider = ({
     convex,
     sessionId,
     isAuthenticated,
-    isConvexAuthLoading,
+    isAuthLoading,
     sessionIdFromLocalStorage,
     setSessionIdFromLocalStorage,
     getAccessToken,
   ]);
 
-  const isLoading = sessionId === undefined || isConvexAuthLoading;
+  const isLoading = sessionId === undefined || isAuthLoading;
   const isUnauthenticated = sessionId === null || !isAuthenticated;
   const state: ChefAuthState = isLoading
     ? { kind: 'loading' }

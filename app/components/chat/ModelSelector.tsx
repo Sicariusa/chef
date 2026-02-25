@@ -192,6 +192,11 @@ export const models: Partial<
     provider: 'openrouter',
     requireKey: true,
   },
+  'z-ai-glm-4.5-air-free': {
+    name: 'GLM-4.5-Air (Free)',
+    provider: 'openrouter',
+    requireKey: true,
+  },
 } as const;
 
 export const ModelSelector = React.memo(function ModelSelector({

@@ -45,6 +45,7 @@ export type ModelSelection =
   | 'kimi-k2'
   | 'devstral-small-2505'
   | 'mai-ds-r1'
-  | 'minimax-m2';
+  | 'minimax-m2'
+  | 'z-ai-glm-4.5-air-free';
 
 export const MAX_CONSECUTIVE_DEPLOY_ERRORS = 5;
