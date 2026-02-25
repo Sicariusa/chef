@@ -40,6 +40,9 @@ export function hasApiKeySet(
     case 'kimi-k2':
     case 'devstral-small-2505':
     case 'mai-ds-r1':
+    case 'minimax-m2':
+      return !!apiKey.openrouter?.trim();
+    case 'z-ai-glm-4.5-air-free':
       return !!apiKey.openrouter?.trim();
     default: {
       const _exhaustiveCheck: never = modelSelection;

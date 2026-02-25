@@ -221,6 +221,7 @@ export const Chat = memo(
           'devstral-small-2505': { providerName: 'openrouter', apiKeyField: 'openrouter' },
           'mai-ds-r1': { providerName: 'openrouter', apiKeyField: 'openrouter' },
           'minimax-m2': { providerName: 'openrouter', apiKeyField: 'openrouter' },
+          'z-ai-glm-4.5-air-free': { providerName: 'openrouter', apiKeyField: 'openrouter' },
         };
 
         // Get provider info for the current model
@@ -374,6 +375,9 @@ export const Chat = memo(
         } else if (modelSelection === 'minimax-m2') {
           modelProvider = 'OpenRouter';
           modelChoice = 'minimax/minimax-m2:free';
+        } else if (modelSelection === 'z-ai-glm-4.5-air-free') {
+          modelProvider = 'OpenRouter';
+          modelChoice = 'z-ai/glm-4.5-air:free';
         } else {
           const _exhaustiveCheck: never = modelSelection;
           throw new Error(`Unknown model: ${_exhaustiveCheck}`);

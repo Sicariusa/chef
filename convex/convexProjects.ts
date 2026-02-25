@@ -329,31 +329,13 @@ async function _connectConvexProjectForMember(
     projectsRemaining: number;
   } = await response.json();
 
-  const projectDeployKeyResponse = await fetch(`${bigBrainHost}/api/dashboard/authorize`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${args.accessToken}`,
-    },
-    body: JSON.stringify({
-      authn_token: args.accessToken,
-      projectId: data.projectId,
-      oauthApp: {
-        clientId: ensureEnvVar("CONVEX_OAUTH_CLIENT_ID"),
-        clientSecret: ensureEnvVar("CONVEX_OAUTH_CLIENT_SECRET"),
-      },
-    }),
-  });
-  if (!projectDeployKeyResponse.ok) {
-    const text = await projectDeployKeyResponse.text();
-    throw new ConvexError({
-      code: "ProvisioningError",
-      message: `Failed to create project deploy key: ${projectDeployKeyResponse.status}`,
-      details: text,
-    });
-  }
-  const projectDeployKeyData: { accessToken: string } = await projectDeployKeyResponse.json();
-  const projectDeployKey = `project:${args.teamSlug}:${data.projectSlug}|${projectDeployKeyData.accessToken}`;
+  // Use the adminKey returned directly by /api/create_project.
+  // The /api/dashboard/authorize endpoint expects a token obtained via the
+  // Convex OAuth flow (exchanged using CONVEX_OAUTH_CLIENT_ID/SECRET), which
+  // is not what we have here — we have a WorkOS JWT. Using the adminKey from
+  // the create_project response is the correct approach and avoids that
+  // OAuth token mismatch.
+  const projectDeployKey = data.adminKey;
   const warningMessage =
     data.projectsRemaining <= 2 ? `You have ${data.projectsRemaining} projects remaining on this team.` : undefined;
 
